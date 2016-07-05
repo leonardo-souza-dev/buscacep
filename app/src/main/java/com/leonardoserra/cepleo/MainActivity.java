@@ -1,6 +1,8 @@
 package com.leonardoserra.cepleo;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 //import android.support.design.widget.FloatingActionButton;
 //import android.support.design.widget.Snackbar;
@@ -16,12 +18,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -61,8 +66,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void buscar(View view) {
+        String lCep = edtCep.getText().toString();
+
+        SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
+        String historicoStr = sp.getString("historico", null);
+        SharedPreferences.Editor e = sp.edit();
+        if (historicoStr == null) {
+            e.putString("historico", lCep + ";");
+        } else {
+            e.putString("historico", historicoStr + lCep + ";");
+        }
+        e.commit();
+
         BuscarCepTask task = new BuscarCepTask();
-        task.execute(edtCep.getText().toString());
+        task.execute(lCep);
     }
 
     public void limpaPlaceHolder(View view) {
@@ -77,7 +94,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_historico) {
-            // Handle the camera action
+            Intent i = new Intent(this, HistoricoActivity.class);
+            startActivity(i);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
