@@ -1,5 +1,6 @@
 package com.leonardoserra.cepleo;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,9 +20,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtCep;
     private EditText edtLogradouro;
     private EditText edtComplemento;
-    private EditText edtBairrp;
+    private EditText edtBairro;
     private EditText edtCidade;
     private EditText edtUf;
+    private static final String LOG_TAG = "EXAMPLO_PROGRESSO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         edtCep = (EditText)findViewById(R.id.edtCep);
 
         edtLogradouro = (EditText)findViewById(R.id.edtLogradouro);
-        edtBairrp = (EditText)findViewById(R.id.edtBairro);
+        edtBairro = (EditText)findViewById(R.id.edtBairro);
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
     }
@@ -41,7 +43,19 @@ public class MainActivity extends AppCompatActivity {
         task.execute(edtCep.getText().toString());
     }
 
-    private class BuscarCepTask extends AsyncTask<String, Void, String> {
+    public void limpaPlaceHolder(View view) {
+        edtCep = (EditText)findViewById(R.id.edtCep);
+        edtCep.setText("");
+    }
+
+    private class BuscarCepTask extends AsyncTask<String, Integer, String> {
+
+        private ProgressDialog progress;
+
+        @Override
+        protected void onPreExecute(){
+            progress = ProgressDialog.show(MainActivity.this, "aguarde", "buscando cep");
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -83,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
+            progress.dismiss();
+
             if (s == null)
                 Toast.makeText(MainActivity.this, "Erro ao buscar o Cep", Toast.LENGTH_LONG).show();
 
@@ -95,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 String uf = json.getString("uf");
 
                 edtLogradouro.setText(logradouro);
-                edtBairrp.setText(bairro);
+                edtBairro.setText(bairro);
                 edtCidade.setText(cidade);
                 edtUf.setText(uf);
 
