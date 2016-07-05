@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CepLeo</string>
+    <string name="action_settings">Configuraciones</string>
+    <string name="navigation_drawer_close">Abrir el menú</string>
+    <string name="navigation_drawer_open">Cerrar el menú</string>
+</resources>

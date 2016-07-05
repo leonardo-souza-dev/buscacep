@@ -2,8 +2,16 @@ package com.leonardoserra.cepleo;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+//import android.support.design.widget.FloatingActionButton;
+//import android.support.design.widget.Snackbar;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,7 +23,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private EditText edtCep;
     private EditText edtLogradouro;
@@ -29,13 +38,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         edtCep = (EditText)findViewById(R.id.edtCep);
-
         edtLogradouro = (EditText)findViewById(R.id.edtLogradouro);
         edtBairro = (EditText)findViewById(R.id.edtBairro);
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
+
     }
 
     public void buscar(View view) {
@@ -46,6 +68,21 @@ public class MainActivity extends AppCompatActivity {
     public void limpaPlaceHolder(View view) {
         edtCep = (EditText)findViewById(R.id.edtCep);
         edtCep.setText("");
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_historico) {
+            // Handle the camera action
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private class BuscarCepTask extends AsyncTask<String, Integer, String> {
