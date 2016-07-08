@@ -18,6 +18,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     private EditText edtCidade;
     private EditText edtUf;
     private static final String LOG_TAG = "EXAMPLO_PROGRESSO";
+    private GoogleMap mMap;
+    //static final LatLng HAMBURG = new LatLng(53.558, 9.927);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +56,10 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+//        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+//        Marker hamburg = mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Hamburg"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -63,6 +77,14 @@ public class MainActivity extends AppCompatActivity
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
 
+        atualizarMapa(40,40);
+    }
+
+    private void atualizarMapa(double lat, double lng) {
+        SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        MapsActivity activity = new MapsActivity();
+        activity.setLatLng(lat, lng);
+        map.getMapAsync(activity);
     }
 
     public void buscar(View view) {
@@ -121,7 +143,8 @@ public class MainActivity extends AppCompatActivity
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
 
-                URL url = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + termoBusca + "&formato=jsonp");
+                //URL url = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + termoBusca + "&formato=jsonp");
+                URL url = new URL("http://maps.google.com/maps/api/geocode/json?address=" + termoBusca +"&sensor=false");
                 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
                 connection.setRequestMethod("GET");
@@ -159,20 +182,34 @@ public class MainActivity extends AppCompatActivity
 
             try {
                 JSONObject json = new JSONObject(s);
-                String tipoLogradouro = json.getString("tipo_logradouro");
-                String logradouro = tipoLogradouro + " " +  json.getString("logradouro");
-                String cidade = json.getString("cidade");
-                String bairro = json.getString("bairro");
-                String uf = json.getString("uf");
+//                String tipoLogradouro = json.getString("tipo_logradouro");
+//                String logradouro = tipoLogradouro + " " +  json.getString("logradouro");
+//                String cidade = json.getString("cidade");
 
-                edtLogradouro.setText(logradouro);
+//                String uf = json.getString("uf");
+                JSONArray results = json.getJSONArray("results");
+                JSONObject asd = results.getJSONObject(0);
+                JSONArray qwe = (JSONArray) asd.get("address_components");
+                String bairro = qwe.getJSONObject(1).get("long_name").toString();
+                String cidade = qwe.getJSONObject(2).get("long_name").toString();
+                String uf = qwe.getJSONObject(3).get("short_name").toString();
+//                edtLogradouro.setText(logradouro);
                 edtBairro.setText(bairro);
                 edtCidade.setText(cidade);
                 edtUf.setText(uf);
+
+                JSONObject qwe2 = (JSONObject) asd.get("geometry");
+                gLat = (double)asd.getJSONObject("geometry").getJSONObject("location").get("lat");
+                gLng = (double)asd.getJSONObject("geometry").getJSONObject("location").get("lng");
+
+                atualizarMapa(gLat,gLng);
+                // String bairro2 = qwe2.getJSONObject(1).get("lat").toString();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        private double gLat, gLng;
     }
 }
