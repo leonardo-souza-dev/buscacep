@@ -10,6 +10,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class HistoricoActivity extends AppCompatActivity {
     private ListView lstView;
     private ArrayAdapter<String> listAdapter;
@@ -26,6 +31,11 @@ public class HistoricoActivity extends AppCompatActivity {
         if (historicoStr != null) {
             historicoArray = historicoStr.split(";");
         }
+
+        //inverte ordem
+        List<String> list = Arrays.asList(historicoArray);
+        Collections.reverse(list);
+        historicoArray = (String[]) list.toArray();
 
         listAdapter = new ArrayAdapter<String>(this, R.layout.hist_row, historicoArray);
         lstView.setAdapter(listAdapter);
