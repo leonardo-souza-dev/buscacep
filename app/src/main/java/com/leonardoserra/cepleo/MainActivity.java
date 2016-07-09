@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity
     private EditText edtBairro;
     private EditText edtCidade;
     private EditText edtUf;
-    private static final String LOG_TAG = "EXAMPLO_PROGRESSO";
-    private GoogleMap mMap;
-    //static final LatLng HAMBURG = new LatLng(53.558, 9.927);
+    //private static final String LOG_TAG = "EXAMPLO_PROGRESSO";
+    //private GoogleMap mMap;
+    private String gCepHistorico;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +56,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-//        Marker hamburg = mMap.addMarker(new MarkerOptions().position(HAMBURG).title("Hamburg"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
-//        mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -71,14 +66,20 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         edtCep = (EditText)findViewById(R.id.edtCep);
         edtLogradouro = (EditText)findViewById(R.id.edtLogradouro);
         edtBairro = (EditText)findViewById(R.id.edtBairro);
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
 
-        atualizarMapa(40,40);
+        //gCepHistorico = savedInstanceState != null ? savedInstanceState.getString("cep_historico") : null;
+        Bundle b = getIntent() != null ? getIntent().getExtras() : null;
+        gCepHistorico = b != null ? b.getString("cep_historico") : null;
+
+        if (gCepHistorico == null)
+            atualizarMapa(40,40);
+        else
+            buscar(null);
     }
 
     private void atualizarMapa(double lat, double lng) {
@@ -89,7 +90,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void buscar(View view) {
-        String lCep = edtCep.getText().toString();
+        String lCep;
+
+        if (gCepHistorico != null) {
+            lCep = gCepHistorico;
+            edtCep.setText(lCep);
+        }
+        else
+            lCep = edtCep.getText().toString();
+
+        gCepHistorico = null;
 
         SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         String historicoStr = sp.getString("historico", null);
@@ -132,7 +142,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPreExecute(){
-            progress = ProgressDialog.show(MainActivity.this, "aguarde", "buscando cep");
+            progress = ProgressDialog.show(MainActivity.this, "Aguarde", "Buscando CEP");
         }
 
         @Override
@@ -144,18 +154,17 @@ public class MainActivity extends AppCompatActivity
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
 
-
-                HttpURLConnection connection2 =
+                HttpURLConnection connection1 =
                         (HttpURLConnection)new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" +
                                 termoBusca + "&formato=jsonp").openConnection();
-                connection2.setRequestMethod("GET");
-                connection2.setRequestProperty("Accept", "application/json");
-
-                HttpURLConnection connection1 =
-                        (HttpURLConnection)new URL("http://maps.google.com/maps/api/geocode/json?address=" +
-                                termoBusca +"&sensor=false").openConnection();
                 connection1.setRequestMethod("GET");
                 connection1.setRequestProperty("Accept", "application/json");
+
+                HttpURLConnection connection2 =
+                        (HttpURLConnection)new URL("http://maps.google.com/maps/api/geocode/json?address=" +
+                                termoBusca +"&sensor=false").openConnection();
+                connection2.setRequestMethod("GET");
+                connection2.setRequestProperty("Accept", "application/json");
 
                 if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {
                     BufferedReader stream1 = new BufferedReader(new InputStreamReader(connection1.getInputStream()));
@@ -171,6 +180,7 @@ public class MainActivity extends AppCompatActivity
                         resposta.append(linha);
                     }
                     connection1.disconnect();
+                    connection2.disconnect();
 
                     String respostaStr = resposta.toString();
 
@@ -194,14 +204,14 @@ public class MainActivity extends AppCompatActivity
             try {
                 String[] jsons = s.split(Pattern.quote("|"));
 
-                JSONObject json1 = new JSONObject(jsons[1]);
+                JSONObject json1 = new JSONObject(jsons[0]);
                 String tipoLogradouro = json1.getString("tipo_logradouro");
                 String logradouro = tipoLogradouro + " " +  json1.getString("logradouro");
                 String bairro1 = json1.getString("bairro");
                 String cidade1 = json1.getString("cidade");
                 String uf1 = json1.getString("uf");
 
-                JSONObject json2 = new JSONObject(jsons[0]);
+                JSONObject json2 = new JSONObject(jsons[1]);
                 JSONArray results = json2.getJSONArray("results");
                 JSONObject root = results.getJSONObject(0);
                 JSONArray addressComponents = (JSONArray) root.get("address_components");
@@ -214,16 +224,14 @@ public class MainActivity extends AppCompatActivity
                 edtCidade.setText(cidade1 == null ? cidade2 : cidade1);
                 edtUf.setText(uf1 == null ? uf2 : uf1);
 
-                gLat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
-                gLng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
+                double lat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
+                double lng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
 
-                atualizarMapa(gLat,gLng);
+                atualizarMapa(lat, lng);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        private double gLat, gLng;
     }
 }
