@@ -35,6 +35,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -143,27 +144,37 @@ public class MainActivity extends AppCompatActivity
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
 
-                //URL url = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + termoBusca + "&formato=jsonp");
-                URL url = new URL("http://maps.google.com/maps/api/geocode/json?address=" + termoBusca +"&sensor=false");
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Accept", "application/json");
+                HttpURLConnection connection2 =
+                        (HttpURLConnection)new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" +
+                                termoBusca + "&formato=jsonp").openConnection();
+                connection2.setRequestMethod("GET");
+                connection2.setRequestProperty("Accept", "application/json");
 
-                if (connection.getResponseCode() == 200) {
-                    BufferedReader stream =
-                            new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                HttpURLConnection connection1 =
+                        (HttpURLConnection)new URL("http://maps.google.com/maps/api/geocode/json?address=" +
+                                termoBusca +"&sensor=false").openConnection();
+                connection1.setRequestMethod("GET");
+                connection1.setRequestProperty("Accept", "application/json");
+
+                if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {
+                    BufferedReader stream1 = new BufferedReader(new InputStreamReader(connection1.getInputStream()));
+                    BufferedReader stream2 = new BufferedReader(new InputStreamReader(connection2.getInputStream()));
 
                     String linha = "";
                     StringBuilder resposta = new StringBuilder();
-
-                    while ((linha = stream.readLine()) != null) {
+                    while ((linha = stream1.readLine()) != null) {
                         resposta.append(linha);
                     }
+                    resposta.append('|');
+                    while ((linha = stream2.readLine()) != null) {
+                        resposta.append(linha);
+                    }
+                    connection1.disconnect();
 
-                    connection.disconnect();
+                    String respostaStr = resposta.toString();
 
-                    return resposta.toString();
+                    return respostaStr;
                 }
 
             } catch (Exception e) {
@@ -181,29 +192,32 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "Erro ao buscar o Cep", Toast.LENGTH_LONG).show();
 
             try {
-                JSONObject json = new JSONObject(s);
-//                String tipoLogradouro = json.getString("tipo_logradouro");
-//                String logradouro = tipoLogradouro + " " +  json.getString("logradouro");
-//                String cidade = json.getString("cidade");
+                String[] jsons = s.split(Pattern.quote("|"));
 
-//                String uf = json.getString("uf");
-                JSONArray results = json.getJSONArray("results");
-                JSONObject asd = results.getJSONObject(0);
-                JSONArray qwe = (JSONArray) asd.get("address_components");
-                String bairro = qwe.getJSONObject(1).get("long_name").toString();
-                String cidade = qwe.getJSONObject(2).get("long_name").toString();
-                String uf = qwe.getJSONObject(3).get("short_name").toString();
-//                edtLogradouro.setText(logradouro);
-                edtBairro.setText(bairro);
-                edtCidade.setText(cidade);
-                edtUf.setText(uf);
+                JSONObject json1 = new JSONObject(jsons[1]);
+                String tipoLogradouro = json1.getString("tipo_logradouro");
+                String logradouro = tipoLogradouro + " " +  json1.getString("logradouro");
+                String bairro1 = json1.getString("bairro");
+                String cidade1 = json1.getString("cidade");
+                String uf1 = json1.getString("uf");
 
-                JSONObject qwe2 = (JSONObject) asd.get("geometry");
-                gLat = (double)asd.getJSONObject("geometry").getJSONObject("location").get("lat");
-                gLng = (double)asd.getJSONObject("geometry").getJSONObject("location").get("lng");
+                JSONObject json2 = new JSONObject(jsons[0]);
+                JSONArray results = json2.getJSONArray("results");
+                JSONObject root = results.getJSONObject(0);
+                JSONArray addressComponents = (JSONArray) root.get("address_components");
+                String bairro2 = addressComponents.getJSONObject(1).get("long_name").toString();
+                String cidade2 = addressComponents.getJSONObject(2).get("long_name").toString();
+                String uf2 = addressComponents.getJSONObject(3).get("short_name").toString();
+
+                edtLogradouro.setText(logradouro);
+                edtBairro.setText(bairro1 == null ? bairro2 : bairro1);
+                edtCidade.setText(cidade1 == null ? cidade2 : cidade1);
+                edtUf.setText(uf1 == null ? uf2 : uf1);
+
+                gLat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
+                gLng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
 
                 atualizarMapa(gLat,gLng);
-                // String bairro2 = qwe2.getJSONObject(1).get("lat").toString();
 
             } catch (Exception e) {
                 e.printStackTrace();
