@@ -1,11 +1,13 @@
 package com.leonardoserra.cepleo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 //import android.support.design.widget.FloatingActionButton;
 //import android.support.design.widget.Snackbar;
+import android.os.Vibrator;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -85,19 +87,20 @@ public class MainActivity extends AppCompatActivity
     private void atualizarMapa(double lat, double lng) {
         SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         MapsActivity activity = new MapsActivity();
-        activity.setLatLng(lat, lng);
+        activity.inicializa(lat, lng, gCep);
         map.getMapAsync(activity);
     }
 
+    private String gCep;
+
     public void buscar(View view) {
-        String lCep;
 
         if (gCepHistorico != null) {
-            lCep = gCepHistorico;
-            edtCep.setText(lCep);
+            gCep = gCepHistorico;
+            edtCep.setText(gCep);
         }
         else
-            lCep = edtCep.getText().toString();
+            gCep = edtCep.getText().toString();
 
         gCepHistorico = null;
 
@@ -105,14 +108,14 @@ public class MainActivity extends AppCompatActivity
         String historicoStr = sp.getString("historico", null);
         SharedPreferences.Editor e = sp.edit();
         if (historicoStr == null) {
-            e.putString("historico", lCep + ";");
+            e.putString("historico", gCep + ";");
         } else {
-            e.putString("historico", historicoStr + lCep + ";");
+            e.putString("historico", historicoStr + gCep + ";");
         }
         e.commit();
 
         BuscarCepTask task = new BuscarCepTask();
-        task.execute(lCep);
+        task.execute(gCep);
     }
 
     public void limpaPlaceHolder(View view) {
@@ -205,13 +208,27 @@ public class MainActivity extends AppCompatActivity
                 String[] jsons = s.split(Pattern.quote("|"));
 
                 JSONObject json1 = new JSONObject(jsons[0]);
+                JSONObject json2 = new JSONObject(jsons[1]);
+
+                String resultado1 = json1.getString("resultado");
+                String resultado2 = json2.getString("status");
+
+                if (resultado1.equals("0") || resultado2.equals("ZERO_RESULTS")) {
+                    Toast.makeText(MainActivity.this,"CEP não encontrado",Toast.LENGTH_LONG).show();
+
+                    Vibrator vs = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+                    vs.vibrate(1000);
+
+                    return;
+                }
+
                 String tipoLogradouro = json1.getString("tipo_logradouro");
                 String logradouro = tipoLogradouro + " " +  json1.getString("logradouro");
                 String bairro1 = json1.getString("bairro");
                 String cidade1 = json1.getString("cidade");
                 String uf1 = json1.getString("uf");
 
-                JSONObject json2 = new JSONObject(jsons[1]);
+
                 JSONArray results = json2.getJSONArray("results");
                 JSONObject root = results.getJSONObject(0);
                 JSONArray addressComponents = (JSONArray) root.get("address_components");

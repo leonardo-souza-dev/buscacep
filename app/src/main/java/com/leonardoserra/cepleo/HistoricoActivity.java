@@ -1,6 +1,5 @@
 package com.leonardoserra.cepleo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -10,20 +9,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class HistoricoActivity extends AppCompatActivity {
-    private ListView lstView;
+
+    private ListView listView;
     private ArrayAdapter<String> listAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historico);
 
-        lstView = (ListView) findViewById(R.id.listView);
+        listView = (ListView) findViewById(R.id.listView);
 
         String[] historicoArray = new String[0];
         SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
@@ -38,9 +38,9 @@ public class HistoricoActivity extends AppCompatActivity {
         historicoArray = (String[]) list.toArray();
 
         listAdapter = new ArrayAdapter<String>(this, R.layout.hist_row, historicoArray);
-        lstView.setAdapter(listAdapter);
+        listView.setAdapter(listAdapter);
 
-        lstView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 

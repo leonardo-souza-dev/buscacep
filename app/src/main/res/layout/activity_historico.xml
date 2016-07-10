@@ -9,11 +9,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.leonardoserra.cepleo.HistoricoActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/historico_titulo"
+        android:id="@+id/txtTitulo"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_margin="16dp" />
+
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtTitulo" />
 </RelativeLayout>

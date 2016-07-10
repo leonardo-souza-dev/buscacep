@@ -5,5 +5,6 @@
 
     <string name="navigation_drawer_open">Abrir menu</string>
     <string name="navigation_drawer_close">Fechar menu</string>
+    <string name="historico_titulo">Histórico</string>
 
 </resources>

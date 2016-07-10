@@ -22,7 +22,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:onClick="limpaPlaceHolder"
-        android:text="Cep" />
+        android:text="Cep"
+        android:inputType="number" />
 
     <Button
         android:layout_width="wrap_content"

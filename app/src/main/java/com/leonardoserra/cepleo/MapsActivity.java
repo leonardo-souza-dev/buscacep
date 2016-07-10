@@ -7,15 +7,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private double gLat, gLng;
+    private MarkerOptions gMarkerOptions;
+    private LatLng gPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,24 +28,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-    public void setLatLng(double lat, double lng){
+    public void inicializa(double lat, double lng, String cep){
+        setLatLng(lat, lng);
+        setTituloMarcador(cep);
+    }
+
+    private void setTituloMarcador(String t) {
+        gMarkerOptions = new MarkerOptions();
+        gPos = new LatLng(gLat, gLng);
+        gMarkerOptions.position(gPos).title(t);
+    }
+
+    private void setLatLng(double lat, double lng){
         this.gLat = lat;
         this.gLng = lng;
     }
 
-    private Marker m;
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googleMap.clear();
-        MarkerOptions ultimoMarker = new MarkerOptions();
 
         mMap = googleMap;
-
-        LatLng pos = new LatLng(gLat, gLng);
-        ultimoMarker.position(pos).title("Marker");
-        m = mMap.addMarker(ultimoMarker);
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gLat, gLng), 20.0f));
+        mMap.addMarker(gMarkerOptions);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gPos, 20.0f));
     }
 }
