@@ -16,6 +16,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double gLat, gLng;
     private MarkerOptions gMarkerOptions;
     private LatLng gPos;
+    private float gZoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,27 +30,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void inicializa(double lat, double lng, String cep){
-        setLatLng(lat, lng);
-        setTituloMarcador(cep);
-    }
-
-    private void setTituloMarcador(String t) {
+        gLat = lat;
+        gLng = lng;
+        gZoom = 18.0f;
         gMarkerOptions = new MarkerOptions();
         gPos = new LatLng(gLat, gLng);
-        gMarkerOptions.position(gPos).title(t);
+        gMarkerOptions.position(gPos).title(cep);
     }
 
-    private void setLatLng(double lat, double lng){
-        this.gLat = lat;
-        this.gLng = lng;
+    public void setMapaInicial() {
+        gZoom = 1.0f;
+        gSetMapaInicial = true;
     }
+
+    private boolean gSetMapaInicial = false;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googleMap.clear();
 
         mMap = googleMap;
-        mMap.addMarker(gMarkerOptions);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gPos, 10.0f));
+
+        if (!gSetMapaInicial) {
+            mMap.addMarker(gMarkerOptions);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gPos, gZoom));
+        }
+
     }
 }

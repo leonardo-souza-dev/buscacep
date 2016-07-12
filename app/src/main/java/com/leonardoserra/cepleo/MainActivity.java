@@ -1,11 +1,13 @@
 package com.leonardoserra.cepleo;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Vibrator;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,9 +15,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -25,19 +29,23 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private EditText edtCep;
+    private EditText edtCep2;
     private EditText edtLogradouro;
     private EditText edtBairro;
     private EditText edtCidade;
     private EditText edtUf;
     private String gCepHistorico;
+    private SupportMapFragment map;
+    private boolean gFaltaInternet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +63,32 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        edtCep = (EditText)findViewById(R.id.edtCep);
+        edtCep2 = (EditText) findViewById(R.id.edtCep);
         edtLogradouro = (EditText)findViewById(R.id.edtLogradouro);
         edtBairro = (EditText)findViewById(R.id.edtBairro);
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
 
+        map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
         Bundle b = getIntent() != null ? getIntent().getExtras() : null;
         gCepHistorico = b != null ? b.getString("cep_historico") : null;
 
         if (gCepHistorico == null)
-            atualizarMapa(40,40);
+            atualizarMapa(40, 40, true);
         else
             buscar(null);
     }
 
-    private void atualizarMapa(double lat, double lng) {
+    private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
         SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         MapsActivity activity = new MapsActivity();
-        activity.inicializa(lat, lng, gCep);
+
+        if (!setMapaInicial)
+            activity.inicializa(lat, lng, gCep);
+        else
+            activity.setMapaInicial();
+
         map.getMapAsync(activity);
     }
 
@@ -83,10 +98,10 @@ public class MainActivity extends AppCompatActivity
 
         if (gCepHistorico != null) {
             gCep = gCepHistorico;
-            edtCep.setText(gCep);
+            edtCep2.setText(gCep);
         }
         else
-            gCep = edtCep.getText().toString();
+            gCep = edtCep2.getText().toString();
 
         gCepHistorico = null;
 
@@ -136,22 +151,25 @@ public class MainActivity extends AppCompatActivity
             if (params.length < 1 || params[0] == "" || params[0] == null)
                 Toast.makeText(MainActivity.this, R.string.insira_um_cep, Toast.LENGTH_LONG).show();
 
+            HttpURLConnection connection1 = null;
+            HttpURLConnection connection2 = null;
+
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
 
-                HttpURLConnection connection1 =
-                        (HttpURLConnection)new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" +
+                connection1 = (HttpURLConnection)new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" +
                                 termoBusca + "&formato=jsonp").openConnection();
                 connection1.setRequestMethod("GET");
                 connection1.setRequestProperty("Accept", "application/json");
 
-                HttpURLConnection connection2 =
-                        (HttpURLConnection)new URL("http://maps.google.com/maps/api/geocode/json?address=" +
+                connection2 = (HttpURLConnection)new URL("http://maps.google.com/maps/api/geocode/json?address=" +
                                 termoBusca +"&sensor=false").openConnection();
                 connection2.setRequestMethod("GET");
                 connection2.setRequestProperty("Accept", "application/json");
 
                 if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {
+                    gFaltaInternet = false;
+
                     BufferedReader stream1 = new BufferedReader(new InputStreamReader(connection1.getInputStream()));
                     BufferedReader stream2 = new BufferedReader(new InputStreamReader(connection2.getInputStream()));
 
@@ -172,8 +190,15 @@ public class MainActivity extends AppCompatActivity
                     return respostaStr;
                 }
 
+            } catch (UnknownHostException e) {
+                gFaltaInternet = true;
+            } catch (ConnectException e) {
+                gFaltaInternet = true;
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                connection1.disconnect();
+                connection2.disconnect();
             }
 
             return null;
@@ -182,6 +207,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String s) {
             progress.dismiss();
+
+
+            if (gFaltaInternet) {
+                Toast.makeText(getApplicationContext(), "Parece que não há internet disponível", Toast.LENGTH_LONG).show();
+                return;
+            }
 
             if (s == null)
                 Toast.makeText(MainActivity.this, R.string.erro_ao_buscar_cep, Toast.LENGTH_LONG).show();
@@ -226,7 +257,7 @@ public class MainActivity extends AppCompatActivity
                 double lat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
                 double lng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
 
-                atualizarMapa(lat, lng);
+                atualizarMapa(lat, lng, false);
 
             } catch (Exception e) {
                 e.printStackTrace();
