@@ -6,5 +6,13 @@
     <string name="navigation_drawer_open">Abrir menu</string>
     <string name="navigation_drawer_close">Fechar menu</string>
     <string name="historico_titulo">Histórico</string>
+    <string name="cep">CEP</string>
+    <string name="cep_nao_encontrado">CEP não encontrado</string>
+    <string name="erro_ao_buscar_cep">Erro ao buscar o CEP</string>
+    <string name="buscando_cep">Buscando CEP</string>
+    <string name="aguarde">Aguarde</string>
+    <string name="insira_um_cep">Insira um CEP</string>
+    <string name="buscar_cep">BUSCAR CEP</string>
+    <string name="logradouro">Logradouro</string>
 
 </resources>

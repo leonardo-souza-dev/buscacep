@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-//import android.support.design.widget.FloatingActionButton;
-//import android.support.design.widget.Snackbar;
 import android.os.Vibrator;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,23 +18,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
@@ -44,12 +34,9 @@ public class MainActivity extends AppCompatActivity
 
     private EditText edtCep;
     private EditText edtLogradouro;
-    private EditText edtComplemento;
     private EditText edtBairro;
     private EditText edtCidade;
     private EditText edtUf;
-    //private static final String LOG_TAG = "EXAMPLO_PROGRESSO";
-    //private GoogleMap mMap;
     private String gCepHistorico;
 
     @Override
@@ -74,7 +61,6 @@ public class MainActivity extends AppCompatActivity
         edtCidade = (EditText)findViewById(R.id.edtCidade);
         edtUf = (EditText)findViewById(R.id.edtUf);
 
-        //gCepHistorico = savedInstanceState != null ? savedInstanceState.getString("cep_historico") : null;
         Bundle b = getIntent() != null ? getIntent().getExtras() : null;
         gCepHistorico = b != null ? b.getString("cep_historico") : null;
 
@@ -118,10 +104,6 @@ public class MainActivity extends AppCompatActivity
         task.execute(gCep);
     }
 
-    public void limpaPlaceHolder(View view) {
-        edtCep = (EditText)findViewById(R.id.edtCep);
-        edtCep.setText("");
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -145,14 +127,14 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPreExecute(){
-            progress = ProgressDialog.show(MainActivity.this, "Aguarde", "Buscando CEP");
+            progress = ProgressDialog.show(MainActivity.this, getString(R.string.aguarde), getString(R.string.buscando_cep));
         }
 
         @Override
         protected String doInBackground(String... params) {
 
             if (params.length < 1 || params[0] == "" || params[0] == null)
-                Toast.makeText(MainActivity.this, "Insira um CEP", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.insira_um_cep, Toast.LENGTH_LONG).show();
 
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
@@ -202,7 +184,7 @@ public class MainActivity extends AppCompatActivity
             progress.dismiss();
 
             if (s == null)
-                Toast.makeText(MainActivity.this, "Erro ao buscar o Cep", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.erro_ao_buscar_cep, Toast.LENGTH_LONG).show();
 
             try {
                 String[] jsons = s.split(Pattern.quote("|"));
@@ -214,7 +196,7 @@ public class MainActivity extends AppCompatActivity
                 String resultado2 = json2.getString("status");
 
                 if (resultado1.equals("0") || resultado2.equals("ZERO_RESULTS")) {
-                    Toast.makeText(MainActivity.this,"CEP não encontrado",Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, R.string.cep_nao_encontrado,Toast.LENGTH_LONG).show();
 
                     Vibrator vs = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
                     vs.vibrate(1000);
