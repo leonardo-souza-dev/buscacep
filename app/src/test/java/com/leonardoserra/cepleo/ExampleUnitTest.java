@@ -1,4 +1,4 @@
-package com.leonardoserra.cepleo;
+package com.leonardoserra.buscacepcommapa;
 
 import org.junit.Test;
 

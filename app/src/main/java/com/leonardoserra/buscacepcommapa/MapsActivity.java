@@ -1,4 +1,4 @@
-package com.leonardoserra.cepleo;
+package com.leonardoserra.buscacepcommapa;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

@@ -1,4 +1,4 @@
-package com.leonardoserra.cepleo;
+package com.leonardoserra.buscacepcommapa;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
