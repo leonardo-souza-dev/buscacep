@@ -103,11 +103,13 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         String historicoStr = sp.getString("historico", null);
         SharedPreferences.Editor e = sp.edit();
+
         if (historicoStr == null) {
             e.putString("historico", cep + ";");
         } else {
             e.putString("historico", historicoStr + cep + ";");
         }
+
         e.commit();
 
         BuscarCepTask task = new BuscarCepTask();
