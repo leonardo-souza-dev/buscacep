@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity
             progress.dismiss();
 
             if (faltaInternet) {
-                Toast.makeText(getApplicationContext(), "Parece que não há internet disponível", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.parece_que_nao_ha), Toast.LENGTH_LONG).show();
                 return;
             }
 

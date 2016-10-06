@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name" translatable="false">CEP com Mapa</string>
     <string name="action_settings">Ajustes</string>
-
     <string name="navigation_drawer_open">Abrir menu</string>
     <string name="navigation_drawer_close">Fechar menu</string>
     <string name="historico_titulo">Histórico</string>
@@ -14,5 +13,6 @@
     <string name="insira_um_cep">Insira um CEP</string>
     <string name="buscar_cep">BUSCAR CEP</string>
     <string name="logradouro">Logradouro</string>
+    <string name="parece_que_nao_ha">Parece que não há internet disponível</string>
 
 </resources>
