@@ -38,7 +38,6 @@
         <activity
             android:name=".MapsActivity"
             android:label="Mapa" />
-        <activity android:name=".OutroActivity"></activity>
     </application>
 
 </manifest>

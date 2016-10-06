@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">CepLeo</string>
+    <string name="app_name" translatable="false">CEP com Mapa</string>
     <string name="action_settings">Ajustes</string>
 
     <string name="navigation_drawer_open">Abrir menu</string>
