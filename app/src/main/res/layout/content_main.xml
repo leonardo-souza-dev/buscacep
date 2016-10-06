@@ -45,7 +45,6 @@
             android:padding="8dp"
             android:text=""
             android:textAlignment="center" />
-
         <Button
             android:id="@+id/btnBusca"
             android:layout_width="fill_parent"
