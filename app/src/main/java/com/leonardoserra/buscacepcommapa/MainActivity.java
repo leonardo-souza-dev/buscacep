@@ -16,6 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity
     private String historicoPesquisa;
     private boolean faltaInternet = false;
     private String cep;
+    private ScrollView resultadoScrollView;
+    private RelativeLayout layoutTop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,8 @@ public class MainActivity extends AppCompatActivity
         bairroEditText = (EditText) findViewById(R.id.bairroEditText);
         cidadeEditText = (EditText) findViewById(R.id.cidadeEditText);
         ufEditText = (EditText) findViewById(R.id.ufEditText);
+        resultadoScrollView = (ScrollView) findViewById(R.id.resultadoScrollView);
+        layoutTop = (RelativeLayout) findViewById(R.id.layout_top);
 
         map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
@@ -75,6 +81,15 @@ public class MainActivity extends AppCompatActivity
             atualizarMapa(40, 40, true);
         else
             buscar(null);
+
+
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0,70,0,0);
+        layoutTop.setLayoutParams(params);
     }
 
     private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
@@ -239,6 +254,15 @@ public class MainActivity extends AppCompatActivity
                 String bairro2 = addressComponents.getJSONObject(1).get("long_name").toString();
                 String cidade2 = addressComponents.getJSONObject(2).get("long_name").toString();
                 String uf2 = addressComponents.getJSONObject(3).get("short_name").toString();
+
+                resultadoScrollView.setVisibility(View.VISIBLE);
+
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0,0,0,0);
+                layoutTop.setLayoutParams(params);
 
                 logradouroEditText.setText(logradouro);
                 bairroEditText.setText(bairro1 == null ? bairro2 : bairro1);

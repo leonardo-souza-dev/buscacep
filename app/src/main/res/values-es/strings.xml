@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CepLeo</string>
+    <string name="app_name">Búsqueda de código postal con el mapa</string>
     <string name="action_settings">Configuraciones</string>
     <string name="navigation_drawer_close">Abrir el menú</string>
     <string name="navigation_drawer_open">Cerrar el menú</string>
+    <string name="cep">Zip Code</string>
+    <string name="insira_um_cep">Introducir un código postal</string>
 </resources>
