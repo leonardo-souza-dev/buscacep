@@ -53,6 +53,28 @@ public class MainActivity extends AppCompatActivity
     private ScrollView resultadoScrollView;
     private RelativeLayout layoutTop;
     private TextView localidadeTextView;
+    private TextWatcher tw = new TextWatcher() {
+        private CepDigitadoListener cepDigitadoListener = new CepDigitadoListener();
+
+        public void afterTextChanged(Editable s) {
+            Log.d("after", s.toString());
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            Log.d("before", s.toString());
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            //Integer tamanhoTextoAnterior = cepDigitadoListener.obterTamanhoTextoAnterior();
+
+            //int qtd = s.length();
+            //String novoCaracter = s.toString().substring(qtd - 1, qtd);
+            //cepDigitadoListener.addCaracter(novoCaracter);
+            String localidade = cepDigitadoListener.getLocalidade(s.toString());
+
+            localidadeTextView.setText(localidade);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,53 +123,83 @@ public class MainActivity extends AppCompatActivity
         layoutTop.setLayoutParams(params);
     }
 
-    private TextWatcher tw = new TextWatcher() {
-        public void afterTextChanged(Editable s){
-            Log.d("after", s.toString());
+    private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
+        SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        MapsActivity activity = new MapsActivity();
+
+        if (!setMapaInicial)
+            activity.inicializa(lat, lng, cep);
+        else
+            activity.setMapaInicial();
+
+        map.getMapAsync(activity);
+    }
+
+    public void buscar(View view) {
+
+        if (historicoPesquisa != null) {
+            cep = historicoPesquisa;
+            cepEditText.setText(cep);
+        } else
+            cep = cepEditText.getText().toString();
+
+        historicoPesquisa = null;
+
+        SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
+        String historicoStr = sp.getString("historico", null);
+        SharedPreferences.Editor e = sp.edit();
+
+        if (historicoStr == null) {
+            e.putString("historico", cep + ";");
+        } else {
+            e.putString("historico", historicoStr + cep + ";");
         }
 
-        public void  beforeTextChanged(CharSequence s, int start, int count, int after){
-            Log.d("before", s.toString());
+        e.commit();
+
+        BuscarCepTask task = new BuscarCepTask();
+        task.execute(cep);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.nav_historico) {
+            Intent i = new Intent(this, HistoricoActivity.class);
+            startActivity(i);
         }
 
-        public void  onTextChanged (CharSequence s, int start, int before,int count) {
-            //Integer tamanhoTextoAnterior = cepDigitadoListener.obterTamanhoTextoAnterior();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
-            //int qtd = s.length();
-            //String novoCaracter = s.toString().substring(qtd - 1, qtd);
-            //cepDigitadoListener.addCaracter(novoCaracter);
-            String localidade = cepDigitadoListener.getLocalidade(s.toString());
-
-            localidadeTextView.setText(localidade);
-        }
-
-        private CepDigitadoListener cepDigitadoListener = new CepDigitadoListener();
-    };
-
-
-    private class CepDigitadoListener{
+    private class CepDigitadoListener {
 
         private String localidade = "";
 
         private ArrayList<String> cepDigitado = new ArrayList<>();
 
-        public Integer obterTamanhoTextoAnterior(){
+        public Integer obterTamanhoTextoAnterior() {
             return cepDigitado.size();
         }
 
-        public String getLocalidade(String texto){
+        public String getLocalidade(String texto) {
             String localidade;
 
-            String primeiroCaracter = texto.substring(0,1);
-            String segundoCaracter = texto.length() > 1 ? texto.substring(1,2) : "";
-            String terceiroCaracter = texto.length() > 2 ? texto.substring(2,3) : "";
-            switch (primeiroCaracter){
+            String primeiroCaracter = texto.substring(0, 1);
+            String segundoCaracter = texto.length() > 1 ? texto.substring(1, 2) : "";
+            String terceiroCaracter = texto.length() > 2 ? texto.substring(2, 3) : "";
+            switch (primeiroCaracter) {
                 case "0":
                     localidade = "Grande São Paulo";
-                    switch (segundoCaracter){
+                    switch (segundoCaracter) {
                         case "1":
                             localidade = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
-                            switch (terceiroCaracter){
+                            switch (terceiroCaracter) {
                                 case "0":
                                     localidade = "Centro (Sé e República)";
                                     break;
@@ -172,7 +224,7 @@ public class MainActivity extends AppCompatActivity
                             break;
                         case "2":
                             localidade = "Santana e Vila Guilherme, Vila Maria, Jaçanã e Tucuruvi, Tremembé, Mandaqui, Casa Verde, Cachoeirinha, Limão, Brasilândia, Freguesia do Ó";
-                            switch (terceiroCaracter){
+                            switch (terceiroCaracter) {
                                 case "0":
                                     localidade = "Santana e Vila Guilherme";
                                     break;
@@ -212,7 +264,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     break;
                 case "1":
-                    localidade = "Interior e litoral de sao paulo";
+                    localidade = "Interior e litoral de São Paulo";
                     break;
                 case "2":
                     localidade = "Rio de Janeiro";
@@ -245,9 +297,9 @@ public class MainActivity extends AppCompatActivity
             return localidade;
         }
 
-        private String obterSubRegiao(ArrayList<String> cepDigitado){
+        private String obterSubRegiao(ArrayList<String> cepDigitado) {
             String localidadeIndice1;
-            switch (cepDigitado.get(1)){
+            switch (cepDigitado.get(1)) {
                 case "1":
                     localidadeIndice1 = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
                     break;
@@ -258,9 +310,9 @@ public class MainActivity extends AppCompatActivity
             return localidadeIndice1;
         }
 
-        private String obterSetor(ArrayList<String> cepDigitado){
+        private String obterSetor(ArrayList<String> cepDigitado) {
             String localidadeIndice2;
-            switch (cepDigitado.get(2)){
+            switch (cepDigitado.get(2)) {
                 case "1":
                     localidadeIndice2 = "Bom Retiro";
                     break;
@@ -283,62 +335,6 @@ public class MainActivity extends AppCompatActivity
             return localidadeIndice2;
         }
 
-    }
-
-    private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
-        SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        MapsActivity activity = new MapsActivity();
-
-        if (!setMapaInicial)
-            activity.inicializa(lat, lng, cep);
-        else
-            activity.setMapaInicial();
-
-        map.getMapAsync(activity);
-    }
-
-    public void buscar(View view) {
-
-        if (historicoPesquisa != null) {
-            cep = historicoPesquisa;
-            cepEditText.setText(cep);
-        }
-        else
-            cep = cepEditText.getText().toString();
-
-        historicoPesquisa = null;
-
-        SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
-        String historicoStr = sp.getString("historico", null);
-        SharedPreferences.Editor e = sp.edit();
-
-        if (historicoStr == null) {
-            e.putString("historico", cep + ";");
-        } else {
-            e.putString("historico", historicoStr + cep + ";");
-        }
-
-        e.commit();
-
-        BuscarCepTask task = new BuscarCepTask();
-        task.execute(cep);
-    }
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-
-        if (id == R.id.nav_historico) {
-            Intent i = new Intent(this, HistoricoActivity.class);
-            startActivity(i);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private class BuscarCepTask extends AsyncTask<String, Integer, String> {
