@@ -21,8 +21,7 @@
         android:background="#1e21a8"
         android:paddingBottom="32dp"
         android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:animateLayoutChanges="true">
+        android:paddingRight="32dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -74,6 +73,58 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnBusca"
+            android:textSize="18dp"
+            android:text=""
+            android:id="@+id/localidadeTextView"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF" />
+<!--
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/localidadeTextView"
+            android:textSize="18dp"
+            android:text="Sub-regiao"
+            android:id="@+id/subRegiaoTextView"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/subRegiaoTextView"
+            android:textSize="18dp"
+            android:text="Setor"
+            android:id="@+id/setorTextView"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/setorTextView"
+            android:textSize="18dp"
+            android:text="Subsetor"
+            android:id="@+id/subsetorTextView"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/subsetorTextView"
+            android:textSize="18dp"
+            android:text="Divisor de Subsetor"
+            android:id="@+id/divisorSubsetorTextView"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF" />
+            -->
+
     </RelativeLayout>
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -83,7 +134,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/layout_top"
-        android:visibility="invisible">
+        android:visibility="visible">
 
         <RelativeLayout
             android:id="@+id/layout_bottom"
@@ -162,6 +213,7 @@
                 android:layout_below="@id/mapaTextView"
                 android:layout_marginTop="16dp"
                 tools:context=".MapsActivity" />
+
         </RelativeLayout>
     </ScrollView>
 

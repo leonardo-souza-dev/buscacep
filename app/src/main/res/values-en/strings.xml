@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Search CEP with Map</string>
+    <string name="app_name">Search zip code with map</string>
     <string name="action_settings">Configurations</string>
     <string name="navigation_drawer_close">Open menu</string>
     <string name="navigation_drawer_open">Close menu</string>
     <string name="historico_titulo">History</string>
     <string name="cep">Zip Code</string>
-    <string name="cep_nao_encontrado">Zip code not foun</string>
+    <string name="cep_nao_encontrado">Zip code not found</string>
     <string name="insira_um_cep">Enter a zip code</string>
+    <string name="aguarde">Wait</string>
+    <string name="buscando_cep">Searching zip code</string>
+    <string name="buscar_cep">Seach zip code</string>
+    <string name="erro_ao_buscar_cep">Error</string>
+    <string name="logradouro">Street</string>
+    <string name="parece_que_nao_ha">There\'s no connection available</string>
 </resources>

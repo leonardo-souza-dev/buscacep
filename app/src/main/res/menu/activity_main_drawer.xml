@@ -3,6 +3,6 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_historico"
             android:icon="@android:drawable/alert_dark_frame"
-            android:title="Histórico"/>
+            android:title="@string/historico_titulo"/>
     </group>
 </menu>

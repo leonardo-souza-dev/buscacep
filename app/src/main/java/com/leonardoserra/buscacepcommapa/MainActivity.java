@@ -13,11 +13,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -31,6 +35,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     private String cep;
     private ScrollView resultadoScrollView;
     private RelativeLayout layoutTop;
+    private TextView localidadeTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +70,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        localidadeTextView = (TextView) findViewById(R.id.localidadeTextView);
+
         cepEditText = (EditText) findViewById(R.id.cepEditText);
+        cepEditText.addTextChangedListener(tw);
         logradouroEditText = (EditText) findViewById(R.id.logradouroEditText);
         bairroEditText = (EditText) findViewById(R.id.bairroEditText);
         cidadeEditText = (EditText) findViewById(R.id.cidadeEditText);
@@ -90,6 +99,190 @@ public class MainActivity extends AppCompatActivity
         );
         params.setMargins(0,70,0,0);
         layoutTop.setLayoutParams(params);
+    }
+
+    private TextWatcher tw = new TextWatcher() {
+        public void afterTextChanged(Editable s){
+            Log.d("after", s.toString());
+        }
+
+        public void  beforeTextChanged(CharSequence s, int start, int count, int after){
+            Log.d("before", s.toString());
+        }
+
+        public void  onTextChanged (CharSequence s, int start, int before,int count) {
+            //Integer tamanhoTextoAnterior = cepDigitadoListener.obterTamanhoTextoAnterior();
+
+            //int qtd = s.length();
+            //String novoCaracter = s.toString().substring(qtd - 1, qtd);
+            //cepDigitadoListener.addCaracter(novoCaracter);
+            String localidade = cepDigitadoListener.getLocalidade(s.toString());
+
+            localidadeTextView.setText(localidade);
+        }
+
+        private CepDigitadoListener cepDigitadoListener = new CepDigitadoListener();
+    };
+
+
+    private class CepDigitadoListener{
+
+        private String localidade = "";
+
+        private ArrayList<String> cepDigitado = new ArrayList<>();
+
+        public Integer obterTamanhoTextoAnterior(){
+            return cepDigitado.size();
+        }
+
+        public String getLocalidade(String texto){
+            String localidade;
+
+            String primeiroCaracter = texto.substring(0,1);
+            String segundoCaracter = texto.length() > 1 ? texto.substring(1,2) : "";
+            String terceiroCaracter = texto.length() > 2 ? texto.substring(2,3) : "";
+            switch (primeiroCaracter){
+                case "0":
+                    localidade = "Grande São Paulo";
+                    switch (segundoCaracter){
+                        case "1":
+                            localidade = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
+                            switch (terceiroCaracter){
+                                case "0":
+                                    localidade = "Centro (Sé e República)";
+                                    break;
+                                case "1":
+                                    localidade = "Bom Retiro";
+                                    break;
+                                case "2":
+                                    localidade = "Vila Buarque e Sumaré";
+                                    break;
+                                case "3":
+                                    localidade = "Consolação";
+                                    break;
+                                case "4":
+                                    localidade = "Jardins";
+                                    break;
+                                case "5":
+                                    localidade = "Liberdade";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case "2":
+                            localidade = "Santana e Vila Guilherme, Vila Maria, Jaçanã e Tucuruvi, Tremembé, Mandaqui, Casa Verde, Cachoeirinha, Limão, Brasilândia, Freguesia do Ó";
+                            switch (terceiroCaracter){
+                                case "0":
+                                    localidade = "Santana e Vila Guilherme";
+                                    break;
+                                case "1":
+                                    localidade = "Vila Maria";
+                                    break;
+                                case "2":
+                                    localidade = "Jaçanã e Tucuruvi";
+                                    break;
+                                case "3":
+                                    localidade = "Tremembé";
+                                    break;
+                                case "4":
+                                    localidade = "Mandaqui";
+                                    break;
+                                case "5":
+                                    localidade = "Casa Verde";
+                                    break;
+                                case "6":
+                                    localidade = "Cachoeirinha";
+                                    break;
+                                case "7":
+                                    localidade = "Limão";
+                                    break;
+                                case "8":
+                                    localidade = "Brasilândia";
+                                    break;
+                                case "9":
+                                    localidade = "Freguesia do Ó";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "1":
+                    localidade = "Interior e litoral de sao paulo";
+                    break;
+                case "2":
+                    localidade = "Rio de Janeiro";
+                    break;
+                case "3":
+                    localidade = "Minas Gerais";
+                    break;
+                case "4":
+                    localidade = "Bahia e Sergipe";
+                    break;
+                case "5":
+                    localidade = "Pernambuco, Alagoas, Paraíba e Rio Grande do Norte";
+                    break;
+                case "6":
+                    localidade = "Ceará, Piauí, Maranhão, Pará, Amapá, Amazonas, Acre e Roraima";
+                    break;
+                case "7":
+                    localidade = "Distrito Federal, Goiás, Rondônia, Tocantins, Mato Grosso e Mato Grosso do Sul";
+                    break;
+                case "8":
+                    localidade = "Paraná e Santa Catarina";
+                    break;
+                case "9":
+                    localidade = "Rio Grande do Sul";
+                    break;
+                default:
+                    localidade = "";
+                    break;
+            }
+            return localidade;
+        }
+
+        private String obterSubRegiao(ArrayList<String> cepDigitado){
+            String localidadeIndice1;
+            switch (cepDigitado.get(1)){
+                case "1":
+                    localidadeIndice1 = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
+                    break;
+                default:
+                    localidadeIndice1 = "x1";
+                    break;
+            }
+            return localidadeIndice1;
+        }
+
+        private String obterSetor(ArrayList<String> cepDigitado){
+            String localidadeIndice2;
+            switch (cepDigitado.get(2)){
+                case "1":
+                    localidadeIndice2 = "Bom Retiro";
+                    break;
+                case "2":
+                    localidadeIndice2 = "Vila Buarque e Sumaré";
+                    break;
+                case "3":
+                    localidadeIndice2 = "Consolação";
+                    break;
+                case "4":
+                    localidadeIndice2 = "Jardins";
+                    break;
+                case "5":
+                    localidadeIndice2 = "Liberdade";
+                    break;
+                default:
+                    localidadeIndice2 = "x2";
+                    break;
+            }
+            return localidadeIndice2;
+        }
+
     }
 
     private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
@@ -236,6 +429,11 @@ public class MainActivity extends AppCompatActivity
                 if (resultado.equals("0") || status.equals("ZERO_RESULTS")) {
                     Toast.makeText(MainActivity.this, R.string.cep_nao_encontrado,Toast.LENGTH_LONG).show();
 
+                    logradouroEditText.setText("");
+                    bairroEditText.setText("");
+                    cidadeEditText.setText("");
+                    ufEditText.setText("");
+
                     Vibrator vs = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
                     vs.vibrate(1000);
 
@@ -271,6 +469,8 @@ public class MainActivity extends AppCompatActivity
 
                 double lat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
                 double lng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
+
+
 
                 atualizarMapa(lat, lng, false);
 

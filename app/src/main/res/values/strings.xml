@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Busca CEP com Mapa</string>
+    <string name="app_name">Busca CEP com Mapa</string>
     <string name="action_settings">Ajustes</string>
     <string name="navigation_drawer_open">Abrir menu</string>
     <string name="navigation_drawer_close">Fechar menu</string>
