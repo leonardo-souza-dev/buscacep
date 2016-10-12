@@ -13,18 +13,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,40 +37,18 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private final Double LAT_PADRAO = 40.0;
+    private final Double LNG_PADRAO = 40.0;
     private EditText cepEditText;
     private EditText logradouroEditText;
     private EditText bairroEditText;
     private EditText cidadeEditText;
     private EditText ufEditText;
-    private SupportMapFragment map;
-    private String historicoPesquisa;
+    //private String historicoPesquisa;
     private boolean faltaInternet = false;
-    private String cep;
-    private ScrollView resultadoScrollView;
-    private RelativeLayout layoutTop;
-    private TextView localidadeTextView;
-    private TextWatcher tw = new TextWatcher() {
-        private CepDigitadoListener cepDigitadoListener = new CepDigitadoListener();
-
-        public void afterTextChanged(Editable s) {
-            Log.d("after", s.toString());
-        }
-
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.d("before", s.toString());
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            //Integer tamanhoTextoAnterior = cepDigitadoListener.obterTamanhoTextoAnterior();
-
-            //int qtd = s.length();
-            //String novoCaracter = s.toString().substring(qtd - 1, qtd);
-            //cepDigitadoListener.addCaracter(novoCaracter);
-            String localidade = cepDigitadoListener.getLocalidade(s.toString());
-
-            localidadeTextView.setText(localidade);
-        }
-    };
+    private String cepPesquisado;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,35 +66,26 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        localidadeTextView = (TextView) findViewById(R.id.localidadeTextView);
+
+        sp = getSharedPreferences("cepleo", MODE_PRIVATE);
+        editor = sp.edit();
+
 
         cepEditText = (EditText) findViewById(R.id.cepEditText);
-        cepEditText.addTextChangedListener(tw);
         logradouroEditText = (EditText) findViewById(R.id.logradouroEditText);
         bairroEditText = (EditText) findViewById(R.id.bairroEditText);
         cidadeEditText = (EditText) findViewById(R.id.cidadeEditText);
         ufEditText = (EditText) findViewById(R.id.ufEditText);
-        resultadoScrollView = (ScrollView) findViewById(R.id.resultadoScrollView);
-        layoutTop = (RelativeLayout) findViewById(R.id.layout_top);
-
-        map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         Bundle bundle = getIntent() != null ? getIntent().getExtras() : null;
-        historicoPesquisa = bundle != null ? bundle.getString("cep_historico") : null;
+        String historicoEndereco = bundle != null ? bundle.getString("historico_endereco") : null;
 
-        if (historicoPesquisa == null)
-            atualizarMapa(40, 40, true);
-        else
-            buscar(null);
-
-
-
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0,70,0,0);
-        layoutTop.setLayoutParams(params);
+        if (historicoEndereco == null)
+            atualizarMapa(LAT_PADRAO, LNG_PADRAO, true);
+        else {
+            Gson gson = new Gson();
+            populaCampos(gson.fromJson(historicoEndereco, Endereco.class));
+        }
     }
 
     private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {
@@ -128,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         MapsActivity activity = new MapsActivity();
 
         if (!setMapaInicial)
-            activity.inicializa(lat, lng, cep);
+            activity.inicializa(lat, lng, cepPesquisado);
         else
             activity.setMapaInicial();
 
@@ -137,28 +102,17 @@ public class MainActivity extends AppCompatActivity
 
     public void buscar(View view) {
 
-        if (historicoPesquisa != null) {
-            cep = historicoPesquisa;
-            cepEditText.setText(cep);
-        } else
-            cep = cepEditText.getText().toString();
+        //if (historicoPesquisa != null) {
+        //    cepPesquisado = historicoPesquisa;
+        //    cepEditText.setText(cepPesquisado);
+        //} else {
+        cepPesquisado = cepEditText.getText().toString();
+        //}
 
-        historicoPesquisa = null;
-
-        SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
-        String historicoStr = sp.getString("historico", null);
-        SharedPreferences.Editor e = sp.edit();
-
-        if (historicoStr == null) {
-            e.putString("historico", cep + ";");
-        } else {
-            e.putString("historico", historicoStr + cep + ";");
-        }
-
-        e.commit();
+        //historicoPesquisa = null;
 
         BuscarCepTask task = new BuscarCepTask();
-        task.execute(cep);
+        task.execute(cepPesquisado);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -177,164 +131,32 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private class CepDigitadoListener {
+    private void insereEnderecoNoHistorico(Endereco endereco) {
 
-        private String localidade = "";
+        String historicoSp = sp.getString("historico", null);
+        ArrayList<Endereco> enderecos = new ArrayList<>();
 
-        private ArrayList<String> cepDigitado = new ArrayList<>();
-
-        public Integer obterTamanhoTextoAnterior() {
-            return cepDigitado.size();
+        if (historicoSp != null) {
+            Gson gson = new Gson();
+            enderecos = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
+            }.getType());
         }
+        enderecos.add(endereco);
+        editor.putString("historico", new Gson().toJson(enderecos));
 
-        public String getLocalidade(String texto) {
-            String localidade;
+        editor.apply();
+    }
 
-            String primeiroCaracter = texto.substring(0, 1);
-            String segundoCaracter = texto.length() > 1 ? texto.substring(1, 2) : "";
-            String terceiroCaracter = texto.length() > 2 ? texto.substring(2, 3) : "";
-            switch (primeiroCaracter) {
-                case "0":
-                    localidade = "Grande São Paulo";
-                    switch (segundoCaracter) {
-                        case "1":
-                            localidade = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
-                            switch (terceiroCaracter) {
-                                case "0":
-                                    localidade = "Centro (Sé e República)";
-                                    break;
-                                case "1":
-                                    localidade = "Bom Retiro";
-                                    break;
-                                case "2":
-                                    localidade = "Vila Buarque e Sumaré";
-                                    break;
-                                case "3":
-                                    localidade = "Consolação";
-                                    break;
-                                case "4":
-                                    localidade = "Jardins";
-                                    break;
-                                case "5":
-                                    localidade = "Liberdade";
-                                    break;
-                                default:
-                                    break;
-                            }
-                            break;
-                        case "2":
-                            localidade = "Santana e Vila Guilherme, Vila Maria, Jaçanã e Tucuruvi, Tremembé, Mandaqui, Casa Verde, Cachoeirinha, Limão, Brasilândia, Freguesia do Ó";
-                            switch (terceiroCaracter) {
-                                case "0":
-                                    localidade = "Santana e Vila Guilherme";
-                                    break;
-                                case "1":
-                                    localidade = "Vila Maria";
-                                    break;
-                                case "2":
-                                    localidade = "Jaçanã e Tucuruvi";
-                                    break;
-                                case "3":
-                                    localidade = "Tremembé";
-                                    break;
-                                case "4":
-                                    localidade = "Mandaqui";
-                                    break;
-                                case "5":
-                                    localidade = "Casa Verde";
-                                    break;
-                                case "6":
-                                    localidade = "Cachoeirinha";
-                                    break;
-                                case "7":
-                                    localidade = "Limão";
-                                    break;
-                                case "8":
-                                    localidade = "Brasilândia";
-                                    break;
-                                case "9":
-                                    localidade = "Freguesia do Ó";
-                                    break;
-                                default:
-                                    break;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case "1":
-                    localidade = "Interior e litoral de São Paulo";
-                    break;
-                case "2":
-                    localidade = "Rio de Janeiro";
-                    break;
-                case "3":
-                    localidade = "Minas Gerais";
-                    break;
-                case "4":
-                    localidade = "Bahia e Sergipe";
-                    break;
-                case "5":
-                    localidade = "Pernambuco, Alagoas, Paraíba e Rio Grande do Norte";
-                    break;
-                case "6":
-                    localidade = "Ceará, Piauí, Maranhão, Pará, Amapá, Amazonas, Acre e Roraima";
-                    break;
-                case "7":
-                    localidade = "Distrito Federal, Goiás, Rondônia, Tocantins, Mato Grosso e Mato Grosso do Sul";
-                    break;
-                case "8":
-                    localidade = "Paraná e Santa Catarina";
-                    break;
-                case "9":
-                    localidade = "Rio Grande do Sul";
-                    break;
-                default:
-                    localidade = "";
-                    break;
-            }
-            return localidade;
-        }
+    private void populaCampos(Endereco endereco) {
 
-        private String obterSubRegiao(ArrayList<String> cepDigitado) {
-            String localidadeIndice1;
-            switch (cepDigitado.get(1)) {
-                case "1":
-                    localidadeIndice1 = "Centro (Sé e República)/ Bom Retiro/ Vila Buarque e Sumaré/ Consolação/ Jardins/ Liberdade";
-                    break;
-                default:
-                    localidadeIndice1 = "x1";
-                    break;
-            }
-            return localidadeIndice1;
-        }
+        cepEditText.setText(endereco.getCep());
 
-        private String obterSetor(ArrayList<String> cepDigitado) {
-            String localidadeIndice2;
-            switch (cepDigitado.get(2)) {
-                case "1":
-                    localidadeIndice2 = "Bom Retiro";
-                    break;
-                case "2":
-                    localidadeIndice2 = "Vila Buarque e Sumaré";
-                    break;
-                case "3":
-                    localidadeIndice2 = "Consolação";
-                    break;
-                case "4":
-                    localidadeIndice2 = "Jardins";
-                    break;
-                case "5":
-                    localidadeIndice2 = "Liberdade";
-                    break;
-                default:
-                    localidadeIndice2 = "x2";
-                    break;
-            }
-            return localidadeIndice2;
-        }
+        logradouroEditText.setText(endereco.getLogradouro());
+        bairroEditText.setText(endereco.getBairro());
+        cidadeEditText.setText(endereco.getCidade());
+        ufEditText.setText(endereco.getUf());
 
+        atualizarMapa(endereco.getLat(), endereco.getLng(), false);
     }
 
     private class BuscarCepTask extends AsyncTask<String, Integer, String> {
@@ -368,6 +190,7 @@ public class MainActivity extends AppCompatActivity
                 connection2 = (HttpURLConnection) new URL(url2).openConnection();
                 connection2.setRequestMethod("GET");
                 connection2.setRequestProperty("Accept", "application/json");
+
 
                 if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {
                     faltaInternet = false;
@@ -425,10 +248,10 @@ public class MainActivity extends AppCompatActivity
                 if (resultado.equals("0") || status.equals("ZERO_RESULTS")) {
                     Toast.makeText(MainActivity.this, R.string.cep_nao_encontrado,Toast.LENGTH_LONG).show();
 
-                    logradouroEditText.setText("");
-                    bairroEditText.setText("");
-                    cidadeEditText.setText("");
-                    ufEditText.setText("");
+                    Endereco endereco = new Endereco(cepPesquisado, "", "", "", "", LAT_PADRAO, LNG_PADRAO);
+
+                    insereEnderecoNoHistorico(endereco);
+                    populaCampos(endereco);
 
                     Vibrator vs = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
                     vs.vibrate(1000);
@@ -449,26 +272,19 @@ public class MainActivity extends AppCompatActivity
                 String cidade2 = addressComponents.getJSONObject(2).get("long_name").toString();
                 String uf2 = addressComponents.getJSONObject(3).get("short_name").toString();
 
-                resultadoScrollView.setVisibility(View.VISIBLE);
+                String bairro = bairro1 == null ? bairro2 : bairro1;
+                String cidade = cidade1 == null ? cidade2 : cidade1;
+                String uf = uf1 == null ? uf2 : uf1;
 
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
-                );
-                params.setMargins(0,0,0,0);
-                layoutTop.setLayoutParams(params);
-
-                logradouroEditText.setText(logradouro);
-                bairroEditText.setText(bairro1 == null ? bairro2 : bairro1);
-                cidadeEditText.setText(cidade1 == null ? cidade2 : cidade1);
-                ufEditText.setText(uf1 == null ? uf2 : uf1);
+                //String historicoResultado = logradouro + ", " + bairro + ", " + cidade + " - " + uf;
 
                 double lat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
                 double lng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
 
+                Endereco endereco = new Endereco(cepPesquisado, logradouro, bairro, cidade, uf, lat, lng);
 
-
-                atualizarMapa(lat, lng, false);
+                insereEnderecoNoHistorico(endereco);
+                populaCampos(endereco);
 
             } catch (Exception e) {
                 e.printStackTrace();

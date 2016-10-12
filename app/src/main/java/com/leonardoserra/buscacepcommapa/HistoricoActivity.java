@@ -9,38 +9,44 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.Arrays;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class HistoricoActivity extends AppCompatActivity {
 
-    private ListView historicoListView;
+    private ListView listView;
     private ArrayAdapter<String> listAdapter;
+    private HistoricoAdapter movieAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historico);
 
-        historicoListView = (ListView) findViewById(R.id.historicoListView);
+        listView = (ListView) findViewById(R.id.historicoListView);//
+        movieAdapter = new HistoricoAdapter(this, R.layout.hist_row);//
+        listView.setAdapter(movieAdapter);//
 
-        String[] historicoArray = new String[0];
+        ArrayList<Endereco> historicoArray = new ArrayList<>();
         SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
-        String historicoStr = sp.getString("historico", null);
-        if (historicoStr != null) {
-            historicoArray = historicoStr.split(";");
+        String historicoSp = sp.getString("historico", null);
+        if (historicoSp != null) {
+            Gson gson = new Gson();
+            historicoArray = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
+            }.getType());
         }
 
         //inverte ordem
-        List<String> list = Arrays.asList(historicoArray);
-        Collections.reverse(list);
-        historicoArray = (String[]) list.toArray();
+        Collections.reverse(historicoArray);
 
-        listAdapter = new ArrayAdapter<>(this, R.layout.hist_row, historicoArray);
-        historicoListView.setAdapter(listAdapter);
+        for (final Endereco entry : historicoArray) {
+            movieAdapter.add(entry);
+        }
 
-        historicoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 

@@ -13,143 +13,82 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/main_content">
 
-    <RelativeLayout
-        android:id="@+id/layout_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:background="#1e21a8"
-        android:paddingBottom="32dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/insira_um_cep"
-            android:id="@+id/insiraTextView"
-            android:hint="@string/insira_um_cep"
-            android:textColor="#FFFFFF"
-            android:textSize="24dp"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:textAlignment="center"
-            android:singleLine="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:id="@+id/cepEditText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/insiraTextView"
-            android:background="@android:color/white"
-            android:inputType="number"
-            android:padding="8dp"
-            android:text=""
-            android:textAlignment="center"
-            android:textSize="40dp"
-            android:layout_marginTop="8dp"
-            android:numeric="integer"
-            android:hint="00000-000" />
-
-        <Button
-            android:id="@+id/btnBusca"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/cepEditText"
-            android:onClick="buscar"
-            android:text="@string/buscar_cep"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btnBusca"
-            android:textSize="18dp"
-            android:text=""
-            android:id="@+id/localidadeTextView"
-            android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF" />
-<!--
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/localidadeTextView"
-            android:textSize="18dp"
-            android:text="Sub-regiao"
-            android:id="@+id/subRegiaoTextView"
-            android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/subRegiaoTextView"
-            android:textSize="18dp"
-            android:text="Setor"
-            android:id="@+id/setorTextView"
-            android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/setorTextView"
-            android:textSize="18dp"
-            android:text="Subsetor"
-            android:id="@+id/subsetorTextView"
-            android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/subsetorTextView"
-            android:textSize="18dp"
-            android:text="Divisor de Subsetor"
-            android:id="@+id/divisorSubsetorTextView"
-            android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF" />
-            -->
-
-    </RelativeLayout>
-
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
         android:id="@+id/resultadoScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/layout_top"
-        android:visibility="visible">
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:id="@+id/layout_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="32dp">
+            android:padding="0dp">
 
             <TextView
+                android:id="@+id/insiraTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Endereço"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:hint="@string/insira_um_cep"
+                android:singleLine="true"
+                android:text="@string/insira_um_cep"
+                android:textAlignment="center"
+                android:textColor="#303F9F"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/cepEditText"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/insiraTextView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/white"
+                android:gravity="center_horizontal"
+                android:hint="00000-000"
+                android:inputType="number"
+                android:numeric="integer"
+                android:padding="8dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textSize="40dp" />
+
+            <Button
+                android:id="@+id/buscarCepButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/cepEditText"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="8dp"
+                android:onClick="buscar"
+                android:text="@string/buscar_cep" />
+
+            <TextView
                 android:id="@+id/enderecoTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/buscarCepButton"
                 android:layout_marginTop="32dp"
-                android:textSize="24dp" />
+                android:text="Endereço"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#303F9F"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/logradouroEditText"
@@ -196,14 +135,16 @@
                 android:text="UF" />
 
             <TextView
+                android:id="@+id/mapaTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Mapa"
-                android:id="@+id/mapaTextView"
                 android:layout_below="@+id/ufEditText"
-                android:textSize="24dp" />
+                android:layout_marginTop="32dp"
+                android:text="Mapa"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#303F9F"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <fragment
                 android:id="@+id/map"
