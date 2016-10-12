@@ -2,6 +2,7 @@ package com.leonardoserra.buscacepcommapa;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,14 +37,14 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 
         view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                vaiParaActivity(entry, position);
+                vaiParaActivity(entry);
             }
         });
 
         return view;
     }
 
-    private void vaiParaActivity(Endereco endereco, int position) {
+    private void vaiParaActivity(Endereco endereco) {
 
         Intent intent = new Intent(context, MainActivity.class);
 
@@ -57,7 +58,15 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 
     private void setElements(ViewHolderSimpleRow viewHolderSimpleRow, Endereco pEntry) {
         viewHolderSimpleRow.histCepRow.setText(pEntry.getCep());
-        viewHolderSimpleRow.histResultadoRow.setText(pEntry.getResultado());
+
+        String resultado;
+        if (pEntry.getResultado().isEmpty()){
+            resultado = "CEP não encontrado";
+            viewHolderSimpleRow.histResultadoRow.setTextColor(Color.RED);
+        } else {
+            resultado = pEntry.getResultado();
+        }
+        viewHolderSimpleRow.histResultadoRow.setText(resultado);
     }
 
     private View getWorkingView(final View convertView) {

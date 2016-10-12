@@ -21,9 +21,12 @@ public class Endereco {
     }
 
     public String getResultado() {
-        return this.logradouro + ", " + this.bairro + ", " + this.cidade + " - " + this.uf;
+        if (!this.logradouro.isEmpty() && !this.bairro.isEmpty() && !this.cidade.isEmpty() && !this.uf.isEmpty()) {
+            return this.logradouro + ", " + this.bairro + ", " + this.cidade + " - " + this.uf;
+        } else {
+            return "";
+        }
     }
-
 
     public String getCep() {
         return this.cep;

@@ -66,7 +66,7 @@
             <Button
                 android:id="@+id/buscarCepButton"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
@@ -74,16 +74,17 @@
                 android:layout_below="@+id/cepEditText"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:onClick="buscar"
-                android:text="@string/buscar_cep" />
+                android:text="@string/buscar_cep"
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/enderecoTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/buscarCepButton"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="40dp"
                 android:text="Endereço"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#303F9F"
@@ -150,7 +151,7 @@
                 android:id="@+id/map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
+                android:layout_height="290dp"
                 android:layout_below="@id/mapaTextView"
                 android:layout_marginTop="16dp"
                 tools:context=".MapsActivity" />

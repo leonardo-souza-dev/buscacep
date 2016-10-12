@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity
         sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         editor = sp.edit();
 
+        mainScrollView.fullScroll(ScrollView.FOCUS_UP);
 
         cepEditText = (EditText) findViewById(R.id.cepEditText);
         logradouroEditText = (EditText) findViewById(R.id.logradouroEditText);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,45 +18,41 @@ import java.util.Collections;
 
 public class HistoricoActivity extends AppCompatActivity {
 
-    private ListView listView;
-    private ArrayAdapter<String> listAdapter;
-    private HistoricoAdapter movieAdapter;
+    private ListView historicoListView;
+    private HistoricoAdapter historicoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historico);
 
-        listView = (ListView) findViewById(R.id.historicoListView);//
-        movieAdapter = new HistoricoAdapter(this, R.layout.hist_row);//
-        listView.setAdapter(movieAdapter);//
+        historicoListView = (ListView) findViewById(R.id.historicoListView);
+        historicoAdapter = new HistoricoAdapter(this, R.layout.hist_row);
+        historicoListView.setAdapter(historicoAdapter);
 
-        ArrayList<Endereco> historicoArray = new ArrayList<>();
+        ArrayList<Endereco> historico = obterHistorico();
+
+        for (final Endereco entry : historico) {
+            historicoAdapter.add(entry);
+        }
+    }
+
+    private ArrayList<Endereco> obterHistorico(){
+
+        ArrayList<Endereco> historico = new ArrayList<>();
+
         SharedPreferences sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         String historicoSp = sp.getString("historico", null);
+
         if (historicoSp != null) {
             Gson gson = new Gson();
-            historicoArray = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
+            historico = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
             }.getType());
         }
 
-        //inverte ordem
-        Collections.reverse(historicoArray);
+        Collections.reverse(historico);
 
-        for (final Endereco entry : historicoArray) {
-            movieAdapter.add(entry);
-        }
+        return historico;
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String clicado = parent.getItemAtPosition(position).toString();
-                Intent intent = new Intent(HistoricoActivity.this, MainActivity.class);
-                intent.putExtra("cep_historico", clicado);
-                startActivity(intent);
-
-            }
-        });
     }
 }
