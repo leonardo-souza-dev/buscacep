@@ -65,6 +65,7 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
             viewHolderSimpleRow.histResultadoRow.setTextColor(Color.RED);
         } else {
             resultado = pEntry.getResultado();
+            viewHolderSimpleRow.histResultadoRow.setTextColor(Color.BLACK);
         }
         viewHolderSimpleRow.histResultadoRow.setText(resultado);
     }

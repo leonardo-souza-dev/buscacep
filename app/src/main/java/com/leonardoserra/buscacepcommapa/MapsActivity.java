@@ -30,9 +30,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void inicializa(double lat, double lng, String cep){
+
         this.lat = lat;
         this.lng = lng;
-        zoom = 18.0f;
+        zoom = 17.0f;
         markerOptions = new MarkerOptions();
         pot = new LatLng(this.lat, this.lng);
         markerOptions.position(pot).title(cep);

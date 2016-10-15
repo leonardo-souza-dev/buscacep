@@ -13,9 +13,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,6 +39,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -44,7 +51,7 @@ public class MainActivity extends AppCompatActivity
     private EditText bairroEditText;
     private EditText cidadeEditText;
     private EditText ufEditText;
-    //private String historicoPesquisa;
+    private ScrollView resultadoScrollView;
     private boolean faltaInternet = false;
     private String cepPesquisado;
     private SharedPreferences sp;
@@ -70,13 +77,27 @@ public class MainActivity extends AppCompatActivity
         sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         editor = sp.edit();
 
-        mainScrollView.fullScroll(ScrollView.FOCUS_UP);
-
+        resultadoScrollView = (ScrollView) findViewById(R.id.resultadoScrollView);
         cepEditText = (EditText) findViewById(R.id.cepEditText);
         logradouroEditText = (EditText) findViewById(R.id.logradouroEditText);
         bairroEditText = (EditText) findViewById(R.id.bairroEditText);
         cidadeEditText = (EditText) findViewById(R.id.cidadeEditText);
         ufEditText = (EditText) findViewById(R.id.ufEditText);
+
+        MaskEditTextChangedListener mascaraCep = new MaskEditTextChangedListener("#####-###", cepEditText);
+        cepEditText.addTextChangedListener(mascaraCep);
+        cepEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    // TODO do something
+                    handled = true;
+                    buscar(v);
+                }
+                return handled;
+            }
+        });
 
         Bundle bundle = getIntent() != null ? getIntent().getExtras() : null;
         String historicoEndereco = bundle != null ? bundle.getString("historico_endereco") : null;
@@ -86,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         else {
             Gson gson = new Gson();
             populaCampos(gson.fromJson(historicoEndereco, Endereco.class));
+            resultadoScrollView.requestFocus();
         }
     }
 
@@ -101,16 +123,16 @@ public class MainActivity extends AppCompatActivity
         map.getMapAsync(activity);
     }
 
+    public void vaiAoTopo(View view) {
+        resultadoScrollView.fullScroll(ScrollView.FOCUS_UP);
+    }
+
     public void buscar(View view) {
 
-        //if (historicoPesquisa != null) {
-        //    cepPesquisado = historicoPesquisa;
-        //    cepEditText.setText(cepPesquisado);
-        //} else {
         cepPesquisado = cepEditText.getText().toString();
-        //}
 
-        //historicoPesquisa = null;
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
         BuscarCepTask task = new BuscarCepTask();
         task.execute(cepPesquisado);

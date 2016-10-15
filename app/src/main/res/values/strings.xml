@@ -14,5 +14,11 @@
     <string name="buscar_cep">BUSCAR CEP</string>
     <string name="logradouro">Logradouro</string>
     <string name="parece_que_nao_ha">Parece que não há internet disponível</string>
+    <string name="mascaraHint">00000-000</string>
+    <string name="endereco">Endereço</string>
+    <string name="bairro">Bairro</string>
+    <string name="cidade">Cidade</string>
+    <string name="uf">UF</string>
+    <string name="mapa">Mapa</string>
 
 </resources>
