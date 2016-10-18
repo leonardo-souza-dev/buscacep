@@ -134,8 +134,10 @@ public class MainActivity extends AppCompatActivity
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-        BuscarCepTask task = new BuscarCepTask();
-        task.execute(cepPesquisado);
+        if (!cepPesquisado.equals("")) {
+            BuscarCepTask task = new BuscarCepTask();
+            task.execute(cepPesquisado);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -151,6 +153,7 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
@@ -208,11 +211,13 @@ public class MainActivity extends AppCompatActivity
                 connection1 = (HttpURLConnection) url1.openConnection();
                 connection1.setRequestMethod("GET");
                 connection1.setRequestProperty("Accept", "application/json");
+                connection1.setConnectTimeout(5000);
 
                 String url2 = "http://maps.google.com/maps/api/geocode/json?address=" + termoBusca + "&sensor=false";
                 connection2 = (HttpURLConnection) new URL(url2).openConnection();
                 connection2.setRequestMethod("GET");
                 connection2.setRequestProperty("Accept", "application/json");
+                connection2.setConnectTimeout(5000);
 
 
                 if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {

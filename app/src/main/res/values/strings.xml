@@ -20,5 +20,6 @@
     <string name="cidade">Cidade</string>
     <string name="uf">UF</string>
     <string name="mapa">Mapa</string>
+    <string name="app_email">buscacepcommapa@gmail.com</string>
 
 </resources>

@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class HistoricoActivity extends AppCompatActivity {
 
@@ -25,7 +26,7 @@ public class HistoricoActivity extends AppCompatActivity {
         historicoAdapter = new HistoricoAdapter(this, R.layout.hist_row);
         historicoListView.setAdapter(historicoAdapter);
 
-        ArrayList<Endereco> historico = obterHistorico();
+        List<Endereco> historico = obterHistorico().subList(0, 5);
 
         for (final Endereco entry : historico) {
             historicoAdapter.add(entry);
