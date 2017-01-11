@@ -8,6 +8,7 @@ Aplicativo Android para busca de CEP com mapa
  * Bairro
  * Cidade
  * UF
+* Histório de CEP's pesquisados offline
 
 ### Tecnologias
 * Android Maps v2
