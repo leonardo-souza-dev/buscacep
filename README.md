@@ -1,4 +1,4 @@
-# buscacep
+# Busca CEP com Mapa
 Aplicativo Android para busca de CEP com mapa
 
 * Integração com duas API's, uma utiliza Retrofit e outra AsyncTask;
