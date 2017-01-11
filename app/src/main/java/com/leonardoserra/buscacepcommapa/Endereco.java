@@ -10,6 +10,7 @@ public class Endereco {
     private Double lat;
     private Double lng;
 
+    public Endereco(){}
     public Endereco(String pCep, String pLogradouro, String pBairro, String pCidade, String pUf, Double pLat, Double pLng) {
         this.cep = pCep;
         this.logradouro = pLogradouro;
@@ -32,27 +33,55 @@ public class Endereco {
         return this.cep;
     }
 
+    public void setCep(String cep){
+        this.cep = cep;
+    }
+
     public String getLogradouro() {
         return this.logradouro;
+    }
+
+    public void setLogradouro(String logradouro){
+        this.logradouro = logradouro;
     }
 
     public String getBairro() {
         return this.bairro;
     }
 
+    public void setBairro(String bairro){
+        this.bairro = bairro;
+    }
+
     public String getCidade() {
         return this.cidade;
+    }
+
+    public void setCidade(String cidade){
+        this.cidade = cidade;
     }
 
     public String getUf() {
         return this.uf;
     }
 
+    public void setUf(String uf){
+        this.uf = uf;
+    }
+
     public Double getLat() {
         return this.lat;
     }
 
+    public void setLat(Double lat){
+        this.lat = lat;
+    }
+
     public Double getLng() {
         return this.lng;
+    }
+
+    public void setLng(Double lng){
+        this.lng = lng;
     }
 }

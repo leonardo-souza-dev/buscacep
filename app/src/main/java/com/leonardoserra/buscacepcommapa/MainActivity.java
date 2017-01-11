@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.leonardoserra.buscacepcommapa.models.MapsGoogle;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +42,11 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -127,6 +134,9 @@ public class MainActivity extends AppCompatActivity
         resultadoScrollView.fullScroll(ScrollView.FOCUS_UP);
     }
 
+    private MapsGoogle mapsGoogle;
+    private Endereco endereco = new Endereco();
+
     public void buscar(View view) {
 
         cepPesquisado = cepEditText.getText().toString();
@@ -135,6 +145,60 @@ public class MainActivity extends AppCompatActivity
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
         if (!cepPesquisado.equals("")) {
+
+            String url = MapsGoogleService.BASE_URL;
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            MapsGoogleService service = retrofit.create(MapsGoogleService.class);
+
+            Call<MapsGoogle> requestMapsGoogle = service.obterMapsGoogle(cepPesquisado);
+            requestMapsGoogle.enqueue(new Callback<MapsGoogle>() {
+                @Override
+                public void onResponse(Call<MapsGoogle> call, Response<MapsGoogle> response) {
+                    if (!response.isSuccess()){
+                        Log.i("LOGECP", "ERRO:" + response.code());
+                    }
+                    else {
+                        mapsGoogle = response.body();
+
+                        if (mapsGoogle.results.get(0).address_components.get(1).types != null
+                                && mapsGoogle.results.get(0).address_components.get(1).types.size() > 1
+                                && mapsGoogle.results.get(0).address_components.get(1).types.get(1).equals("sublocality")) {
+                            endereco.setBairro(mapsGoogle.results.get(0).address_components.get(1).long_name);
+                            endereco.setCidade(mapsGoogle.results.get(0).address_components.get(2).long_name);
+                            endereco.setUf(mapsGoogle.results.get(0).address_components.get(3).short_name);
+                        }
+                        if (mapsGoogle.results.get(0).address_components.get(2).types != null
+                                && mapsGoogle.results.get(0).address_components.get(2).types.size() > 2
+                                && mapsGoogle.results.get(0).address_components.get(2).types.get(2).contains("sublocality")) {
+                            endereco.setBairro(mapsGoogle.results.get(0).address_components.get(2).long_name);
+                            endereco.setCidade(mapsGoogle.results.get(0).address_components.get(3).long_name);
+                            endereco.setUf(mapsGoogle.results.get(0).address_components.get(4).short_name);
+                        }
+                        endereco.setLat(mapsGoogle.results.get(0).geometry.location.lat);
+                        endereco.setLng(mapsGoogle.results.get(0).geometry.location.lng);
+
+
+                        bairroEditText.setText(endereco.getBairro());
+                        cidadeEditText.setText(endereco.getCidade());
+                        ufEditText.setText(endereco.getUf());
+
+                        api1get = true;
+                        insereEnderecoNoHistorico();
+                        atualizarMapa(endereco.getLat(), endereco.getLng(), false);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MapsGoogle> call, Throwable t) {
+                    Log.e("LOGCEP", "ERRO: " + t.getMessage());
+                }
+            });
+
             BuscarCepTask task = new BuscarCepTask();
             task.execute(cepPesquisado);
         }
@@ -157,30 +221,38 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void insereEnderecoNoHistorico(Endereco endereco) {
+    private boolean api1get = false;
+    private boolean api2get = false;
+    private boolean cepNaoEncontrado = false;
 
-        String historicoSp = sp.getString("historico", null);
-        ArrayList<Endereco> enderecos = new ArrayList<>();
+    private void insereEnderecoNoHistorico() {
+        if (cepNaoEncontrado || (api1get && api2get)) {
+            String historicoSp = sp.getString("historico", null);
+            ArrayList<Endereco> enderecos = new ArrayList<>();
 
-        if (historicoSp != null) {
-            Gson gson = new Gson();
-            enderecos = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
-            }.getType());
+            if (historicoSp != null) {
+                Gson gson = new Gson();
+                enderecos = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
+                }.getType());
+            }
+            enderecos.add(endereco);
+            editor.putString("historico", new Gson().toJson(enderecos));
+
+            editor.apply();
+
+            api1get = false;
+            api2get = false;
         }
-        enderecos.add(endereco);
-        editor.putString("historico", new Gson().toJson(enderecos));
-
-        editor.apply();
     }
 
     private void populaCampos(Endereco endereco) {
 
         cepEditText.setText(endereco.getCep());
-
-        logradouroEditText.setText(endereco.getLogradouro());
         bairroEditText.setText(endereco.getBairro());
         cidadeEditText.setText(endereco.getCidade());
         ufEditText.setText(endereco.getUf());
+
+        logradouroEditText.setText(endereco.getLogradouro());
 
         atualizarMapa(endereco.getLat(), endereco.getLng(), false);
     }
@@ -201,7 +273,6 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, R.string.insira_um_cep, Toast.LENGTH_LONG).show();
 
             HttpURLConnection connection1 = null;
-            HttpURLConnection connection2 = null;
             StringBuilder resposta = new StringBuilder();
 
             try {
@@ -213,25 +284,13 @@ public class MainActivity extends AppCompatActivity
                 connection1.setRequestProperty("Accept", "application/json");
                 connection1.setConnectTimeout(5000);
 
-                String url2 = "http://maps.google.com/maps/api/geocode/json?address=" + termoBusca + "&sensor=false";
-                connection2 = (HttpURLConnection) new URL(url2).openConnection();
-                connection2.setRequestMethod("GET");
-                connection2.setRequestProperty("Accept", "application/json");
-                connection2.setConnectTimeout(5000);
-
-
-                if (connection1.getResponseCode() == 200 && connection2.getResponseCode() == 200) {
+                if (connection1.getResponseCode() == 200) {
                     faltaInternet = false;
 
                     BufferedReader stream1 = new BufferedReader(new InputStreamReader(connection1.getInputStream()));
-                    BufferedReader stream2 = new BufferedReader(new InputStreamReader(connection2.getInputStream()));
 
                     String linha;
                     while ((linha = stream1.readLine()) != null) {
-                        resposta.append(linha);
-                    }
-                    resposta.append('|');
-                    while ((linha = stream2.readLine()) != null) {
                         resposta.append(linha);
                     }
                 }
@@ -243,8 +302,6 @@ public class MainActivity extends AppCompatActivity
             } finally {
                 if (connection1 != null)
                     connection1.disconnect();
-                if (connection2 != null)
-                    connection2.disconnect();
             }
 
             return resposta.toString();
@@ -259,63 +316,45 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            String[] jsons = new String[0];
             if (s == null)
                 Toast.makeText(MainActivity.this, R.string.erro_ao_buscar_cep, Toast.LENGTH_LONG).show();
             else {
-                jsons = s.split(Pattern.quote("|"));
-            }
 
-            try {
-                JSONObject resultadoJson = new JSONObject(jsons[0]);
-                JSONObject statusJson = new JSONObject(jsons[1]);
+                try {
+                    JSONObject resultadoJson = new JSONObject(s);
 
-                String resultado = resultadoJson.getString("resultado");
-                String status = statusJson.getString("status");
+                    String resultado = resultadoJson.getString("resultado");
 
-                if (resultado.equals("0") || status.equals("ZERO_RESULTS")) {
-                    Toast.makeText(MainActivity.this, R.string.cep_nao_encontrado,Toast.LENGTH_LONG).show();
+                    if (resultado.equals("0")) {
+                        Toast.makeText(MainActivity.this, R.string.cep_nao_encontrado, Toast.LENGTH_LONG).show();
 
-                    Endereco endereco = new Endereco(cepPesquisado, "", "", "", "", LAT_PADRAO, LNG_PADRAO);
+                        endereco.setCep(cepPesquisado);
+                        endereco.setLat(LAT_PADRAO);
+                        endereco.setLng(LNG_PADRAO);
 
-                    insereEnderecoNoHistorico(endereco);
+                        cepNaoEncontrado = true;
+                        insereEnderecoNoHistorico();
+                        populaCampos(endereco);
+
+                        Vibrator vs = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                        vs.vibrate(1000);
+
+                        return;
+                    }
+
+                    String tipoLogradouro = resultadoJson.getString("tipo_logradouro");
+                    String logradouro = tipoLogradouro + " " + resultadoJson.getString("logradouro");
+
+                    endereco.setCep(cepPesquisado);
+                    endereco.setLogradouro(logradouro);
+
+                    api2get = true;
+                    insereEnderecoNoHistorico();
                     populaCampos(endereco);
 
-                    Vibrator vs = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-                    vs.vibrate(1000);
-
-                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                String tipoLogradouro = resultadoJson.getString("tipo_logradouro");
-                String logradouro = tipoLogradouro + " " + resultadoJson.getString("logradouro");
-                String bairro1 = resultadoJson.getString("bairro");
-                String cidade1 = resultadoJson.getString("cidade");
-                String uf1 = resultadoJson.getString("uf");
-
-                JSONArray results = statusJson.getJSONArray("results");
-                JSONObject root = results.getJSONObject(0);
-                JSONArray addressComponents = (JSONArray) root.get("address_components");
-                String bairro2 = addressComponents.getJSONObject(1).get("long_name").toString();
-                String cidade2 = addressComponents.getJSONObject(2).get("long_name").toString();
-                String uf2 = addressComponents.getJSONObject(3).get("short_name").toString();
-
-                String bairro = bairro1 == null ? bairro2 : bairro1;
-                String cidade = cidade1 == null ? cidade2 : cidade1;
-                String uf = uf1 == null ? uf2 : uf1;
-
-                //String historicoResultado = logradouro + ", " + bairro + ", " + cidade + " - " + uf;
-
-                double lat = (double)root.getJSONObject("geometry").getJSONObject("location").get("lat");
-                double lng = (double)root.getJSONObject("geometry").getJSONObject("location").get("lng");
-
-                Endereco endereco = new Endereco(cepPesquisado, logradouro, bairro, cidade, uf, lat, lng);
-
-                insereEnderecoNoHistorico(endereco);
-                populaCampos(endereco);
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }

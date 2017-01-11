@@ -17,9 +17,9 @@
         android:id="@+id/resultadoScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
 
         <RelativeLayout
             android:id="@+id/layout_bottom"
