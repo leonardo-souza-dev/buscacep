@@ -7,4 +7,16 @@
     <string name="cep">Zip Code</string>
     <string name="insira_um_cep">Introducir un código postal</string>
     <string name="aguarde">Aguarde</string>
+    <string name="cidade">Ciudad</string>
+    <string name="bairro">Barrio</string>
+    <string name="buscando_cep">Buscar código postal</string>
+    <string name="buscar_cep">Buscar código postal</string>
+    <string name="cep_nao_encontrado">Código postal no encontrado</string>
+    <string name="endereco">Dirección</string>
+    <string name="erro_ao_buscar_cep">Error</string>
+    <string name="historico_titulo">"Histórico "</string>
+    <string name="logradouro">Calle</string>
+    <string name="mapa">Mapa</string>
+    <string name="parece_que_nao_ha">No hay conexión disponible</string>
+    <string name="uf">Estado</string>
 </resources>

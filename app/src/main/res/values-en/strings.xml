@@ -14,4 +14,9 @@
     <string name="erro_ao_buscar_cep">Error</string>
     <string name="logradouro">Street</string>
     <string name="parece_que_nao_ha">There\'s no connection available</string>
+    <string name="bairro">District</string>
+    <string name="cidade">City</string>
+    <string name="endereco">Address</string>
+    <string name="mapa">Map</string>
+    <string name="uf">State</string>
 </resources>
