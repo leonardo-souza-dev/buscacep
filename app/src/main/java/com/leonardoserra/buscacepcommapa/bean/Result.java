@@ -1,4 +1,4 @@
-package com.leonardoserra.buscacepcommapa.models;
+package com.leonardoserra.buscacepcommapa.bean;
 
 import java.util.List;
 

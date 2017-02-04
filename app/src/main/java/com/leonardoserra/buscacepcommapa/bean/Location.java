@@ -1,4 +1,4 @@
-package com.leonardoserra.buscacepcommapa.models;
+package com.leonardoserra.buscacepcommapa.bean;
 
 public class Location {
 
