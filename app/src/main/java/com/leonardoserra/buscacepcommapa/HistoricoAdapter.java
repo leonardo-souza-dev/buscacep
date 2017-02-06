@@ -46,7 +46,7 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 
     private void vaiParaActivity(Endereco endereco) {
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, PrincipalActivity.class);
 
         Bundle b = new Bundle();
         b.putString("historico_endereco", new Gson().toJson(endereco));

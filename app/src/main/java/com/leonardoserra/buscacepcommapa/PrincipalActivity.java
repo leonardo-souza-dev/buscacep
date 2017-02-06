@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ScrollView;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -43,7 +44,7 @@ public class PrincipalActivity extends AppCompatActivity
         viewModel = new PrincipalViewModelo(getSupportFragmentManager(), true, new MapsActivity(), R.id.map);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_principal);
         binding.setMod(viewModel);
-        model = new MyModel(viewModel, this);
+        model = new MyModel(viewModel, this, getSharedPreferences("cepleo", MODE_PRIVATE));
 
         binding.buscarCepButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,9 +86,30 @@ public class PrincipalActivity extends AppCompatActivity
             Gson gson = new Gson();
             endereco = gson.fromJson(historicoEndereco, Endereco.class);
 
-            atualizarMapa(endereco.getLat(), endereco.getLng(), false);
+            populaCampos(endereco);
             resultadoScrollView.requestFocus();
         }
+    }
+
+
+    private void populaCampos(Endereco endereco) {
+
+        EditText cep = binding.cepEditText;
+        cep.setText(endereco.getCep());
+
+        EditText logradouro = binding.logradouroEditText;
+        logradouro.setText(endereco.getLogradouro());
+
+        EditText bairro = binding.logradouroEditText;
+        bairro.setText(endereco.getBairro());
+
+        EditText cidade = binding.logradouroEditText;
+        cidade.setText(endereco.getCidade());
+
+        EditText uf = binding.logradouroEditText;
+        uf.setText(endereco.getUf());
+
+        atualizarMapa(endereco.getLat(), endereco.getLng(), false);
     }
 
     private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {

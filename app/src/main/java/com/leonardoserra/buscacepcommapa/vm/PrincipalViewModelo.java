@@ -1,5 +1,6 @@
 package com.leonardoserra.buscacepcommapa.vm;
 
+import android.content.SharedPreferences;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.v4.app.FragmentManager;

@@ -2,11 +2,16 @@ package com.leonardoserra.buscacepcommapa.model;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Vibrator;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.leonardoserra.buscacepcommapa.API.GitHubService;
+import com.leonardoserra.buscacepcommapa.Endereco;
 import com.leonardoserra.buscacepcommapa.R;
 import com.leonardoserra.buscacepcommapa.bean.AddressComponent;
 import com.leonardoserra.buscacepcommapa.bean.MapsGoogle;
@@ -23,12 +28,16 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class MyModel {
 
@@ -39,11 +48,27 @@ public class MyModel {
     private Context context;
     private String cep;
     private Boolean faltaInternet;
+    private boolean api1get = false;
+    private boolean api2get = false;
+    private boolean cepNaoEncontrado = false;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private Endereco endereco = new Endereco();
+    private String cepp;
+    private String logradouro;
+    private String bairro;
+    private String cidade;
+    private String uf;
+    private Double lat;
+    private Double lng;
 
-    public MyModel(PrincipalViewModelo viewModel, Context contextoPassado) {
+    public MyModel(PrincipalViewModelo viewModel, Context contextoPassado, SharedPreferences sp) {
         this.viewModel = viewModel;
         this.git = ServiceGenerator.createService(GitHubService.class);
         context = contextoPassado;
+
+        this.sp = sp;
+        editor = this.sp.edit();
     }
 
     public void busca(String cepPesquisado) {
@@ -60,7 +85,39 @@ public class MyModel {
         viewModel.setMapa(lat, lng, 1.0f);
     }
 
+    private void insereEnderecoNoHistorico() {
+        Log.d("BUSCACEPLOG", "historico: " + new Date().toString());
+        if (cepNaoEncontrado || (api1get && api2get)) {
+            String historicoSp = sp.getString("historico", null);
+            ArrayList<Endereco> enderecos = new ArrayList<>();
+
+            if (historicoSp != null) {
+                Gson gson = new Gson();
+                enderecos = gson.fromJson(historicoSp, new TypeToken<ArrayList<Endereco>>() {
+                }.getType());
+            }
+
+            endereco.setCep(cepp);
+            endereco.setLogradouro(logradouro);
+            endereco.setBairro(bairro);
+            endereco.setCidade(cidade);
+            endereco.setUf(uf);
+            endereco.setLat(lat);
+            endereco.setLng(lng);
+
+
+            enderecos.add(endereco);
+            editor.putString("historico", new Gson().toJson(enderecos));
+
+            editor.apply();
+
+            api1get = false;
+            api2get = false;
+        }
+    }
+
     private void getMapsGoogle(String cepPesquisado) {
+        Log.d("BUSCACEPLOG", "getMapsGoogle COMECO: " + new Date().toString());
         Call<MapsGoogle> call = git.obterMapsGoogle(cepPesquisado);
         call.enqueue(new Callback<MapsGoogle>() {
             @Override
@@ -87,20 +144,40 @@ public class MyModel {
                     if (addressComponent.get(1).types != null
                             && addressComponent.get(1).types.size() > 1
                             && addressComponent.get(1).types.get(1).equals("sublocality")) {
-                        viewModel.setBairro2(addressComponent.get(1).long_name);
-                        viewModel.setCidade2(addressComponent.get(2).long_name);
-                        viewModel.setUf2(addressComponent.get(3).short_name);
+
+                        bairro = addressComponent.get(1).long_name;
+                        viewModel.setBairro2(bairro);
+
+                        cidade = addressComponent.get(2).long_name;
+                        viewModel.setCidade2(cidade);
+
+                        uf = addressComponent.get(3).short_name;
+                        viewModel.setUf2(uf);
                     }
                     if (addressComponent.get(2).types != null
                             && addressComponent.get(2).types.size() > 2
                             && addressComponent.get(2).types.get(2).contains("sublocality")) {
-                        viewModel.setBairro2(addressComponent.get(2).long_name);
-                        viewModel.setCidade2(addressComponent.get(3).long_name);
-                        viewModel.setUf2(addressComponent.get(4).short_name);
+
+                        bairro = addressComponent.get(2).long_name;
+                        viewModel.setBairro2(bairro);
+
+                        cidade = addressComponent.get(3).long_name;
+                        viewModel.setCidade2(cidade);
+
+                        uf = addressComponent.get(4).short_name;
+                        viewModel.setUf2(uf);
                     }
-                    viewModel.setLat2(result.geometry.location.lat);
-                    viewModel.setLng2(result.geometry.location.lng);
-                    viewModel.setMapa(result.geometry.location.lat, result.geometry.location.lng, 17.0f);
+
+                    lat = result.geometry.location.lat;
+                    viewModel.setLat2(lat);
+
+                    lng = result.geometry.location.lng;
+                    viewModel.setLng2(lng);
+
+                    viewModel.setMapa(lat, lng, 17.0f);
+                    Log.d("BUSCACEPLOG", "getMapsGoogle FIM: " + new Date().toString());
+                    api1get = true;
+                    insereEnderecoNoHistorico();
                 }
                 viewModel.setPb2(false);
             }
@@ -114,6 +191,7 @@ public class MyModel {
     }
 
     private void getRepublica(String cepPesquisado) {
+        Log.d("BUSCACEPLOG", "republica COMECO: " + new Date().toString());
         BuscarCepTask task = new BuscarCepTask();
         task.execute(cepPesquisado);
     }
@@ -139,8 +217,8 @@ public class MyModel {
             try {
                 String termoBusca = params[0].trim().replace(",", "").replace("-", "").replace(".", "");
 
-                URL url1 = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + termoBusca + "&formato=jsonp");
-                connection1 = (HttpURLConnection) url1.openConnection();
+                URL url = new URL("http://cep.republicavirtual.com.br/web_cep.php?cep=" + termoBusca + "&formato=jsonp");
+                connection1 = (HttpURLConnection) url.openConnection();
                 connection1.setRequestMethod("GET");
                 connection1.setRequestProperty("Accept", "application/json");
                 connection1.setConnectTimeout(5000);
@@ -154,6 +232,9 @@ public class MyModel {
                     while ((linha = stream1.readLine()) != null) {
                         resposta.append(linha);
                     }
+                    Log.d("BUSCACEPLOG", "republica FIM: " + new Date().toString());
+                    api2get = true;
+                    insereEnderecoNoHistorico();
                 }
 
             } catch (UnknownHostException | ConnectException e) {
@@ -194,7 +275,7 @@ public class MyModel {
                         viewModel.setLng2(LNG_PADRAO);
 
                         //cepNaoEncontrado = true;
-                        //insereEnderecoNoHistorico();
+                        //
 
                         Vibrator vs = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                         vs.vibrate(1000);
@@ -203,14 +284,14 @@ public class MyModel {
                     }
 
                     String tipoLogradouro = resultadoJson.getString("tipo_logradouro");
-                    String logradouro = tipoLogradouro + " " + resultadoJson.getString("logradouro");
+                    String logradouroo = tipoLogradouro + " " + resultadoJson.getString("logradouro");
 
-                    viewModel.setCep2(cep);
-                    viewModel.setLogradouro2(logradouro);
+                    cepp = cep;
+                    viewModel.setCep2(cepp);
+                    logradouro = logradouroo;
+                    viewModel.setLogradouro2(logradouroo);
 
-                    //api2get = true;
-                    //insereEnderecoNoHistorico();
-                    //populaCampos(endereco);
+                    insereEnderecoNoHistorico();
 
                 } catch (Exception e) {
                     e.printStackTrace();

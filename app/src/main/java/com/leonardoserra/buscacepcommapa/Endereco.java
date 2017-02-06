@@ -22,7 +22,8 @@ public class Endereco {
     }
 
     public String getResultado() {
-        if (!this.logradouro.isEmpty() && !this.bairro.isEmpty() && !this.cidade.isEmpty() && !this.uf.isEmpty()) {
+        if (this.logradouro != null && this.bairro  != null && this.cidade != null && this.uf != null &&
+                !this.logradouro.isEmpty() && !this.bairro.isEmpty() && !this.cidade.isEmpty() && !this.uf.isEmpty()) {
             return this.logradouro + ", " + this.bairro + ", " + this.cidade + " - " + this.uf;
         } else {
             return "";
