@@ -9,15 +9,13 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:background="?attr/colorPrimary"/>
     </android.support.design.widget.AppBarLayout>
 
     <!--<include
@@ -32,11 +30,10 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context=".MainActivity"
-        tools:showIn="@layout/main_content">
+        tools:context=".MainActivity">
 
         <ScrollView
-            android:id="@+id/resultadoScrollView"
+            android:id="@+id/content_navigation_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"

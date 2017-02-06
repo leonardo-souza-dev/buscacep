@@ -19,7 +19,7 @@ import android.widget.ScrollView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.leonardoserra.buscacepcommapa.databinding.ActivityMainBinding;
+//import com.leonardoserra.buscacepcommapa.databinding.ActivityMainBinding;
 import com.leonardoserra.buscacepcommapa.model.GitHubModel;
 import com.leonardoserra.buscacepcommapa.vm.MainViewModel;
 
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
 
     private final Double LAT_PADRAO = 40.0;
     private final Double LNG_PADRAO = 40.0;
-    ActivityMainBinding binding = null;
+    //ActivityMainBinding binding = null;
     //private EditText cepEditText;
     private ScrollView resultadoScrollView;
     private String cepPesquisado;
@@ -61,42 +61,40 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         viewModel = new MainViewModel(getSupportFragmentManager(), true, new MapsActivity(), R.id.map);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        binding.setModelo(viewModel);
-
-        Toolbar toolbar = binding.toolbarTest;
-        this.setSupportActionBar(toolbar);
-        //ActionBar actionBar = binding.toolbar;
-        //this.setActionBar(toolbar);
-
-        DrawerLayout drawer = binding.drawerLayout;
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = binding.navView;
-        navigationView.setNavigationItemSelectedListener(this);
+        //binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        //binding.setModelo(viewModel);
         model = new GitHubModel(viewModel, this);
 
-        binding.buscarCepButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                viewModel.setPb(true);
-                model.busca(binding.cepEditText.getText().toString());
-            }
-        });
+        //binding.buscarCepButton.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        //        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        //        viewModel.setPb(true);
+        //        model.busca(binding.cepEditText.getText().toString());
+        //    }
+        //});
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+
+        //DrawerLayout drawer = binding.drawerLayout;
+        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        //drawer.setDrawerListener(toggle);
+        //toggle.syncState();
+
+        //NavigationView navigationView = binding.navView;
+        //navigationView.setNavigationItemSelectedListener(this);
 
         model.atualizaMapaInicial(40.0, 40.0);
 
         sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         editor = sp.edit();
 
-        //resultadoScrollView = (ScrollView) findViewById(R.id.resultadoScrollView);
-        resultadoScrollView = binding.resultadoScrollView;
+        //resultadoScrollView = binding.resultadoScrollView;
 
 
         //obtem historico
@@ -166,6 +164,4 @@ public class MainActivity extends AppCompatActivity
             api2get = false;
         }
     }
-
-
 }

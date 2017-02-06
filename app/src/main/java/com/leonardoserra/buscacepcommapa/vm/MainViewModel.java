@@ -5,7 +5,7 @@ import android.databinding.Bindable;
 import android.support.v4.app.FragmentManager;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.leonardoserra.buscacepcommapa.BR;
+//import com.leonardoserra.buscacepcommapa.BR;
 import com.leonardoserra.buscacepcommapa.MapsActivity;
 
 public class MainViewModel extends BaseObservable {
@@ -38,7 +38,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setCep(String cep) {
         this.cep = cep;
-        notifyPropertyChanged(BR.cep);
+        //notifyPropertyChanged(BR.cep);
     }
 
     @Bindable
@@ -48,7 +48,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setLogradouro(String logradouro) {
         this.logradouro = logradouro;
-        notifyPropertyChanged(BR.logradouro);
+        //notifyPropertyChanged(BR.logradouro);
     }
 
     @Bindable
@@ -58,7 +58,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setBairro(String bairro) {
         this.bairro = bairro;
-        notifyPropertyChanged(BR.bairro);
+        //notifyPropertyChanged(BR.bairro);
     }
 
     @Bindable
@@ -68,7 +68,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setCidade(String cidade) {
         this.cidade = cidade;
-        notifyPropertyChanged(BR.cidade);
+        //notifyPropertyChanged(BR.cidade);
     }
 
     @Bindable
@@ -78,7 +78,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setUf(String uf) {
         this.uf = uf;
-        notifyPropertyChanged(BR.uf);
+        //notifyPropertyChanged(BR.uf);
     }
 
     @Bindable
@@ -88,7 +88,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setLat(Double lat) {
         this.lat = lat;
-        notifyPropertyChanged(BR.lat);
+        //notifyPropertyChanged(BR.lat);
     }
 
     @Bindable
@@ -98,7 +98,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setLng(Double lng) {
         this.lng = lng;
-        notifyPropertyChanged(BR.lng);
+        //notifyPropertyChanged(BR.lng);
     }
 
     @Bindable
@@ -108,7 +108,7 @@ public class MainViewModel extends BaseObservable {
 
     public void setPb(boolean pb) {
         this.pb = pb;
-        notifyPropertyChanged(BR.pb);
+        //notifyPropertyChanged(BR.pb);
     }
 
     public void setMapa(Double lat, Double lng, float zoom) {
