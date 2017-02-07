@@ -99,7 +99,7 @@
                         android:imeOptions="actionDone"
                         android:inputType="number"
                         android:padding="8dp"
-                        android:text="@{mod.cep2}"
+                        android:text="@{mod.cep}"
                         android:textAlignment="center"
                         android:textSize="40sp" />
 
@@ -143,7 +143,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/enderecoTextView"
                         android:hint="@string/logradouro"
-                        android:text="@{mod.logradouro2}" />
+                        android:text="@{mod.logradouro}" />
 
                     <EditText
                         android:id="@+id/bairroEditText"
@@ -155,7 +155,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/logradouroEditText"
                         android:hint="@string/bairro"
-                        android:text="@{mod.bairro2}" />
+                        android:text="@{mod.bairro}" />
 
                     <EditText
                         android:id="@+id/cidadeEditText"
@@ -167,7 +167,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/bairroEditText"
                         android:hint="@string/cidade"
-                        android:text="@{mod.cidade2}" />
+                        android:text="@{mod.cidade}" />
 
                     <EditText
                         android:id="@+id/ufEditText"
@@ -179,7 +179,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/cidadeEditText"
                         android:hint="@string/uf"
-                        android:text="@{mod.uf2}" />
+                        android:text="@{mod.uf}" />
 
                     <TextView
                         android:id="@+id/mapaTextView"
@@ -224,7 +224,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="83dp"
                         android:indeterminate="false"
-                        android:visibility="@{mod.pb2 ? View.VISIBLE : View.GONE}" />
+                        android:visibility="@{mod.progressBar ? View.VISIBLE : View.GONE}" />
 
                 </RelativeLayout>
 

@@ -37,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MyModel {
+public class Model {
 
     private MyService git;
     private PrincipalViewModelo viewModel;
@@ -58,7 +58,7 @@ public class MyModel {
     private Double lat;
     private Double lng;
 
-    public MyModel(PrincipalViewModelo viewModel, Context contextoPassado, SharedPreferences sp) {
+    public Model(PrincipalViewModelo viewModel, Context contextoPassado, SharedPreferences sp) {
         this.viewModel = viewModel;
         this.git = ServiceGenerator.createService(MyService.class);
         context = contextoPassado;
@@ -119,12 +119,12 @@ public class MyModel {
                     ResponseBody responseBody = response.errorBody();
                     if (responseBody != null) {
                         try {
-                            viewModel.setBairro2("responseBody = " + responseBody.string());
+                            viewModel.setBairro("responseBody = " + responseBody.string());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        viewModel.setBairro2("responseBody  = null");
+                        viewModel.setBairro("responseBody  = null");
                     }
                 } else {
                     //200
@@ -136,45 +136,45 @@ public class MyModel {
                             && addressComponent.get(1).types.get(1).equals("sublocality")) {
 
                         bairro = addressComponent.get(1).long_name;
-                        viewModel.setBairro2(bairro);
+                        viewModel.setBairro(bairro);
 
                         cidade = addressComponent.get(2).long_name;
-                        viewModel.setCidade2(cidade);
+                        viewModel.setCidade(cidade);
 
                         uf = addressComponent.get(3).short_name;
-                        viewModel.setUf2(uf);
+                        viewModel.setUf(uf);
                     }
                     if (addressComponent.get(2).types != null
                             && addressComponent.get(2).types.size() > 2
                             && addressComponent.get(2).types.get(2).contains("sublocality")) {
 
                         bairro = addressComponent.get(2).long_name;
-                        viewModel.setBairro2(bairro);
+                        viewModel.setBairro(bairro);
 
                         cidade = addressComponent.get(3).long_name;
-                        viewModel.setCidade2(cidade);
+                        viewModel.setCidade(cidade);
 
                         uf = addressComponent.get(4).short_name;
-                        viewModel.setUf2(uf);
+                        viewModel.setUf(uf);
                     }
 
                     lat = result.geometry.location.lat;
-                    viewModel.setLat2(lat);
+                    viewModel.setLat(lat);
 
                     lng = result.geometry.location.lng;
-                    viewModel.setLng2(lng);
+                    viewModel.setLng(lng);
 
                     viewModel.setMapa(lat, lng);
                     api1get = true;
                     insereEnderecoNoHistorico();
                 }
-                viewModel.setPb2(false);
+                viewModel.setProgressBar(false);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                viewModel.setBairro2("t = " + t.getMessage());
-                viewModel.setPb2(false);
+                viewModel.setBairro("t = " + t.getMessage());
+                viewModel.setProgressBar(false);
             }
         });
     }
@@ -257,11 +257,11 @@ public class MyModel {
                     if (resultado.equals("0")) {
                         Toast.makeText(context, R.string.cep_nao_encontrado, Toast.LENGTH_LONG).show();
 
-                        viewModel.setCep2(cep);
+                        viewModel.setCep(cep);
                         Double LAT_PADRAO = 40.0;
-                        viewModel.setLat2(LAT_PADRAO);
+                        viewModel.setLat(LAT_PADRAO);
                         Double LNG_PADRAO = 40.0;
-                        viewModel.setLng2(LNG_PADRAO);
+                        viewModel.setLng(LNG_PADRAO);
 
                         Vibrator vs = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                         vs.vibrate(1000);
@@ -273,9 +273,9 @@ public class MyModel {
                     String logradouroo = tipoLogradouro + " " + resultadoJson.getString("logradouro");
 
                     cepp = cep;
-                    viewModel.setCep2(cepp);
+                    viewModel.setCep(cepp);
                     logradouro = logradouroo;
-                    viewModel.setLogradouro2(logradouroo);
+                    viewModel.setLogradouro(logradouroo);
 
                     insereEnderecoNoHistorico();
 

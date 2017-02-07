@@ -1,6 +1,5 @@
 package com.leonardoserra.buscacepcommapa.vm;
 
-import android.content.SharedPreferences;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.v4.app.FragmentManager;
@@ -10,122 +9,119 @@ import com.leonardoserra.buscacepcommapa.MapsActivity;
 
 public class PrincipalViewModelo extends BaseObservable {
 
-    private boolean pb2;
-    private String cep2;
-    private String logradouro2;
-    private String bairro2;
-    private String cidade2;
-    private String uf2;
-    private Double lat2;
-    private Double lng2;
+    private boolean progressBar;
+    private String cep;
+    private String logradouro;
+    private String bairro;
+    private String cidade;
+    private String uf;
+    private Double lat;
+    private Double lng;
 
-    private boolean setMapaInicial;
     private FragmentManager fm;
     private MapsActivity mapsActivity;
     private int idMapa;
 
-    public PrincipalViewModelo(FragmentManager fm, boolean setMapaInicial, MapsActivity mapsActivity, int idMapa) {
+    public PrincipalViewModelo(FragmentManager fm, MapsActivity mapsActivity, int idMapa) {
         this.mapsActivity = mapsActivity;
-        this.setMapaInicial = setMapaInicial;
         this.fm = fm;
         this.idMapa = idMapa;
     }
 
     @Bindable
-    public String getCep2() {
-        return cep2;
+    public String getCep() {
+        return cep;
     }
 
-    public void setCep2(String cep) {
-        this.cep2 = cep;
-        notifyPropertyChanged(BR.cep2);
-    }
-
-    @Bindable
-    public String getLogradouro2() {
-        return logradouro2;
-    }
-
-    public void setLogradouro2(String logradouro) {
-        this.logradouro2 = logradouro;
-        notifyPropertyChanged(BR.logradouro2);
+    public void setCep(String cep) {
+        this.cep = cep;
+        notifyPropertyChanged(BR.cep);
     }
 
     @Bindable
-    public String getBairro2() {
-        return bairro2;
+    public String getLogradouro() {
+        return logradouro;
     }
 
-    public void setBairro2(String bairro) {
-        this.bairro2 = bairro;
-        notifyPropertyChanged(BR.bairro2);
-    }
-
-    @Bindable
-    public String getCidade2() {
-        return cidade2;
-    }
-
-    public void setCidade2(String cidade) {
-        this.cidade2 = cidade;
-        notifyPropertyChanged(BR.cidade2);
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
+        notifyPropertyChanged(BR.logradouro);
     }
 
     @Bindable
-    public String getUf2() {
-        return uf2;
+    public String getBairro() {
+        return bairro;
     }
 
-    public void setUf2(String uf) {
-        this.uf2 = uf;
-        notifyPropertyChanged(BR.uf2);
-    }
-
-    @Bindable
-    public Double getLat2() {
-        return lat2;
-    }
-
-    public void setLat2(Double lat) {
-        this.lat2 = lat;
-        notifyPropertyChanged(BR.lat2);
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+        notifyPropertyChanged(BR.bairro);
     }
 
     @Bindable
-    public Double getLng2() {
-        return lng2;
+    public String getCidade() {
+        return cidade;
     }
 
-    public void setLng2(Double lng) {
-        this.lng2 = lng;
-        notifyPropertyChanged(BR.lng2);
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+        notifyPropertyChanged(BR.cidade);
     }
 
     @Bindable
-    public boolean isPb2() {
-        return pb2;
+    public String getUf() {
+        return uf;
     }
 
-    public void setPb2(boolean pb) {
-        this.pb2 = pb;
-        notifyPropertyChanged(BR.pb2);
+    public void setUf(String uf) {
+        this.uf = uf;
+        notifyPropertyChanged(BR.uf);
+    }
+
+    @Bindable
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+        notifyPropertyChanged(BR.lat);
+    }
+
+    @Bindable
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+        notifyPropertyChanged(BR.lng);
+    }
+
+    @Bindable
+    public boolean isProgressBar() {
+        return progressBar;
+    }
+
+    public void setProgressBar(boolean progressBar) {
+        this.progressBar = progressBar;
+        notifyPropertyChanged(BR.progressBar);
     }
 
     public void setMapa(Double lat, Double lng) {
         SupportMapFragment map = (SupportMapFragment) fm.findFragmentById(idMapa);
 
-        mapsActivity.inicializa(lat, lng, 17.0f, this.cep2);
+        mapsActivity.inicializa(lat, lng, 17.0f, this.cep);
 
         map.getMapAsync(mapsActivity);
     }
 
-    private final Double LAT_PADRAO = 40.0;
-    private final Double LNG_PADRAO = 40.0;
-
     public void setMapaInicial() {
         SupportMapFragment map = (SupportMapFragment) fm.findFragmentById(idMapa);
 
-        mapsActivity.inicializa(LAT_PADRAO, LNG_PADRAO, 1.0f, this.cep2);
+        Double LAT_PADRAO = 40.0;
+        Double LNG_PADRAO = 40.0;
+        mapsActivity.inicializa(LAT_PADRAO, LNG_PADRAO, 1.0f, this.cep);
 
         map.getMapAsync(mapsActivity);
     }

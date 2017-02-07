@@ -2,7 +2,10 @@
   <dictionary name="vava">
     <words>
       <w>bairro</w>
+      <w>endereco</w>
+      <w>historico</w>
       <w>logradouro</w>
+      <w>topo</w>
     </words>
   </dictionary>
 </component>
