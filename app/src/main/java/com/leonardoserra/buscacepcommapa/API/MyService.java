@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 
-public interface GitHubService {
+public interface MyService {
 
     @GET("/maps/api/geocode/json?sensor=false")
     Call<MapsGoogle> obterMapsGoogle(@Query("address") String cep);

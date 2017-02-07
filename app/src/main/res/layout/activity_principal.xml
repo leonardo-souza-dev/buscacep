@@ -51,7 +51,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:focusableInTouchMode="true"
-                tools:context="com.leonardoserra.buscacepcommapa.MainActivity"
+                tools:context="com.leonardoserra.buscacepcommapa.PrincipalActivity"
                 tools:showIn="@layout/activity_principal"
                 android:background="#ffff3f">
 

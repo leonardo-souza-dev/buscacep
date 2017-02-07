@@ -1,4 +1,4 @@
-package com.leonardoserra.buscacepcommapa;
+package com.leonardoserra.buscacepcommapa.bean;
 
 public class Endereco {
 
@@ -10,8 +10,11 @@ public class Endereco {
     private Double lat;
     private Double lng;
 
-    public Endereco(){}
-    public Endereco(String pCep, String pLogradouro, String pBairro, String pCidade, String pUf, Double pLat, Double pLng) {
+    public Endereco(){
+
+    }
+
+    /*public Endereco(String pCep, String pLogradouro, String pBairro, String pCidade, String pUf, Double pLat, Double pLng) {
         this.cep = pCep;
         this.logradouro = pLogradouro;
         this.bairro = pBairro;
@@ -19,7 +22,7 @@ public class Endereco {
         this.uf = pUf;
         this.lat = pLat;
         this.lng = pLng;
-    }
+    }*/
 
     public String getResultado() {
         if (this.logradouro != null && this.bairro  != null && this.cidade != null && this.uf != null &&

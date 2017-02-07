@@ -19,6 +19,7 @@ import android.widget.ScrollView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.gson.Gson;
+import com.leonardoserra.buscacepcommapa.bean.Endereco;
 import com.leonardoserra.buscacepcommapa.databinding.ActivityPrincipalBinding;
 import com.leonardoserra.buscacepcommapa.model.MyModel;
 import com.leonardoserra.buscacepcommapa.vm.PrincipalViewModelo;
@@ -32,8 +33,6 @@ public class PrincipalActivity extends AppCompatActivity
     private ScrollView resultadoScrollView;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
-    private final Double LAT_PADRAO = 40.0;
-    private final Double LNG_PADRAO = 40.0;
     private Endereco endereco = new Endereco();
     private String cepPesquisado;
 
@@ -68,7 +67,8 @@ public class PrincipalActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        model.atualizaMapaInicial(40.0, 40.0);
+        //model.atualizaMapaInicial(40.0, 40.0);
+        viewModel.setMapaInicial();
 
         sp = getSharedPreferences("cepleo", MODE_PRIVATE);
         editor = sp.edit();
@@ -81,7 +81,8 @@ public class PrincipalActivity extends AppCompatActivity
         String historicoEndereco = bundle != null ? bundle.getString("historico_endereco") : null;
 
         if (historicoEndereco == null)
-            atualizarMapa(LAT_PADRAO, LNG_PADRAO, true);
+            //atualizarMapa(LAT_PADRAO, LNG_PADRAO, true);
+            viewModel.setMapaInicial();
         else {
             Gson gson = new Gson();
             endereco = gson.fromJson(historicoEndereco, Endereco.class);
@@ -91,25 +92,15 @@ public class PrincipalActivity extends AppCompatActivity
         }
     }
 
-
     private void populaCampos(Endereco endereco) {
 
-        EditText cep = binding.cepEditText;
-        cep.setText(endereco.getCep());
+        viewModel.setCep2(endereco.getCep());
+        viewModel.setLogradouro2(endereco.getLogradouro());
+        viewModel.setBairro2(endereco.getBairro());
+        viewModel.setCidade2(endereco.getCidade());
+        viewModel.setUf2(endereco.getUf());
 
-        EditText logradouro = binding.logradouroEditText;
-        logradouro.setText(endereco.getLogradouro());
-
-        EditText bairro = binding.logradouroEditText;
-        bairro.setText(endereco.getBairro());
-
-        EditText cidade = binding.logradouroEditText;
-        cidade.setText(endereco.getCidade());
-
-        EditText uf = binding.logradouroEditText;
-        uf.setText(endereco.getUf());
-
-        atualizarMapa(endereco.getLat(), endereco.getLng(), false);
+        viewModel.setMapa(endereco.getLat(), endereco.getLng());
     }
 
     private void atualizarMapa(double lat, double lng, boolean setMapaInicial) {

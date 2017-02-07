@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.leonardoserra.buscacepcommapa.bean.Endereco;
 
 public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 

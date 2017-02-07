@@ -111,10 +111,21 @@ public class PrincipalViewModelo extends BaseObservable {
         notifyPropertyChanged(BR.pb2);
     }
 
-    public void setMapa(Double lat, Double lng, float zoom) {
+    public void setMapa(Double lat, Double lng) {
         SupportMapFragment map = (SupportMapFragment) fm.findFragmentById(idMapa);
 
-        mapsActivity.inicializa(lat, lng, zoom, this.cep2);
+        mapsActivity.inicializa(lat, lng, 17.0f, this.cep2);
+
+        map.getMapAsync(mapsActivity);
+    }
+
+    private final Double LAT_PADRAO = 40.0;
+    private final Double LNG_PADRAO = 40.0;
+
+    public void setMapaInicial() {
+        SupportMapFragment map = (SupportMapFragment) fm.findFragmentById(idMapa);
+
+        mapsActivity.inicializa(LAT_PADRAO, LNG_PADRAO, 1.0f, this.cep2);
 
         map.getMapAsync(mapsActivity);
     }

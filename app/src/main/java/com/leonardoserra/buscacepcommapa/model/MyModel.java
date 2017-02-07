@@ -10,8 +10,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.leonardoserra.buscacepcommapa.API.GitHubService;
-import com.leonardoserra.buscacepcommapa.Endereco;
+import com.leonardoserra.buscacepcommapa.API.MyService;
+import com.leonardoserra.buscacepcommapa.bean.Endereco;
 import com.leonardoserra.buscacepcommapa.R;
 import com.leonardoserra.buscacepcommapa.bean.AddressComponent;
 import com.leonardoserra.buscacepcommapa.bean.MapsGoogle;
@@ -37,13 +37,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class MyModel {
 
-    private final Double LAT_PADRAO = 40.0;
-    private final Double LNG_PADRAO = 40.0;
-    private GitHubService git;
+    private MyService git;
     private PrincipalViewModelo viewModel;
     private Context context;
     private String cep;
@@ -64,7 +60,7 @@ public class MyModel {
 
     public MyModel(PrincipalViewModelo viewModel, Context contextoPassado, SharedPreferences sp) {
         this.viewModel = viewModel;
-        this.git = ServiceGenerator.createService(GitHubService.class);
+        this.git = ServiceGenerator.createService(MyService.class);
         context = contextoPassado;
 
         this.sp = sp;
@@ -78,11 +74,6 @@ public class MyModel {
             getMapsGoogle(cepPesquisado);
             getRepublica(cepPesquisado);
         }
-    }
-
-    public void atualizaMapaInicial(double lat, double lng) {
-
-        viewModel.setMapa(lat, lng, 1.0f);
     }
 
     private void insereEnderecoNoHistorico() {
@@ -105,7 +96,6 @@ public class MyModel {
             endereco.setLat(lat);
             endereco.setLng(lng);
 
-
             enderecos.add(endereco);
             editor.putString("historico", new Gson().toJson(enderecos));
 
@@ -117,7 +107,7 @@ public class MyModel {
     }
 
     private void getMapsGoogle(String cepPesquisado) {
-        Log.d("BUSCACEPLOG", "getMapsGoogle COMECO: " + new Date().toString());
+
         Call<MapsGoogle> call = git.obterMapsGoogle(cepPesquisado);
         call.enqueue(new Callback<MapsGoogle>() {
             @Override
@@ -174,8 +164,7 @@ public class MyModel {
                     lng = result.geometry.location.lng;
                     viewModel.setLng2(lng);
 
-                    viewModel.setMapa(lat, lng, 17.0f);
-                    Log.d("BUSCACEPLOG", "getMapsGoogle FIM: " + new Date().toString());
+                    viewModel.setMapa(lat, lng);
                     api1get = true;
                     insereEnderecoNoHistorico();
                 }
@@ -191,7 +180,6 @@ public class MyModel {
     }
 
     private void getRepublica(String cepPesquisado) {
-        Log.d("BUSCACEPLOG", "republica COMECO: " + new Date().toString());
         BuscarCepTask task = new BuscarCepTask();
         task.execute(cepPesquisado);
     }
@@ -232,7 +220,6 @@ public class MyModel {
                     while ((linha = stream1.readLine()) != null) {
                         resposta.append(linha);
                     }
-                    Log.d("BUSCACEPLOG", "republica FIM: " + new Date().toString());
                     api2get = true;
                     insereEnderecoNoHistorico();
                 }
@@ -271,11 +258,10 @@ public class MyModel {
                         Toast.makeText(context, R.string.cep_nao_encontrado, Toast.LENGTH_LONG).show();
 
                         viewModel.setCep2(cep);
+                        Double LAT_PADRAO = 40.0;
                         viewModel.setLat2(LAT_PADRAO);
+                        Double LNG_PADRAO = 40.0;
                         viewModel.setLng2(LNG_PADRAO);
-
-                        //cepNaoEncontrado = true;
-                        //
 
                         Vibrator vs = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
                         vs.vibrate(1000);

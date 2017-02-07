@@ -163,7 +163,7 @@ public class MainViewModel extends BaseObservable {
 
     private void getRetrofit(){
 
-        GitHubService service = retrofit.create(GitHubService.class);
+        MyService service = retrofit.create(MyService.class);
 
         Call<MapsGoogle> requestMapsGoogle = service.obterMapsGoogle(cep);
 

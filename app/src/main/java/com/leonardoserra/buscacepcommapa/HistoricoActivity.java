@@ -8,6 +8,7 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.leonardoserra.buscacepcommapa.bean.Endereco;
 
 import java.util.ArrayList;
 import java.util.Collections;
