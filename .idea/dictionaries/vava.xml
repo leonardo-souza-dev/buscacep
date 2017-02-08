@@ -2,9 +2,19 @@
   <dictionary name="vava">
     <words>
       <w>bairro</w>
+      <w>busca</w>
+      <w>cidade</w>
+      <w>contexto</w>
+      <w>encontrado</w>
       <w>endereco</w>
+      <w>falta</w>
       <w>historico</w>
+      <w>linha</w>
       <w>logradouro</w>
+      <w>passado</w>
+      <w>resposta</w>
+      <w>resultado</w>
+      <w>termo</w>
       <w>topo</w>
     </words>
   </dictionary>

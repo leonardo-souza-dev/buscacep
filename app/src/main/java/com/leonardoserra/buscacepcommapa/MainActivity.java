@@ -2,7 +2,7 @@ package com.leonardoserra.buscacepcommapa;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,26 +18,24 @@ import android.widget.ScrollView;
 
 import com.google.gson.Gson;
 import com.leonardoserra.buscacepcommapa.bean.Endereco;
-import com.leonardoserra.buscacepcommapa.databinding.ActivityPrincipalBinding;
+import com.leonardoserra.buscacepcommapa.databinding.ActivityMainBinding;
 import com.leonardoserra.buscacepcommapa.model.Model;
-import com.leonardoserra.buscacepcommapa.vm.PrincipalViewModelo;
+import com.leonardoserra.buscacepcommapa.vm.MainViewModel;
 
-public class PrincipalActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    ActivityPrincipalBinding binding = null;
-    private PrincipalViewModelo viewModel;
+    ActivityMainBinding binding = null;
+    private MainViewModel viewModel;
     private Model model;
     private ScrollView resultadoScrollView;
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new PrincipalViewModelo(getSupportFragmentManager(), new MapsActivity(), R.id.map);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_principal);
+        viewModel = new MainViewModel(getSupportFragmentManager(), new MapsActivity(), R.id.map);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setMod(viewModel);
         model = new Model(viewModel, this, getSharedPreferences("cepleo", MODE_PRIVATE));
 
@@ -65,15 +63,12 @@ public class PrincipalActivity extends AppCompatActivity
 
         viewModel.setMapaInicial();
 
-        sp = getSharedPreferences("cepleo", MODE_PRIVATE);
-        editor = sp.edit();
-
-        resultadoScrollView = binding.resultadoScrollView;
-
         historico();
     }
 
     private void historico() {
+
+        resultadoScrollView = binding.resultadoScrollView;
 
         Bundle bundle = getIntent() != null ? getIntent().getExtras() : null;
         String historicoEndereco = bundle != null ? bundle.getString("historico_endereco") : null;

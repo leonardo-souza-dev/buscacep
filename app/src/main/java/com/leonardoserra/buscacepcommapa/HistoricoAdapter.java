@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,12 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.leonardoserra.buscacepcommapa.bean.Endereco;
 
-public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
+final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 
     private final int layout;
     private Context context;
 
-    public HistoricoAdapter(final Context pContext, final int pLayout) {
+    HistoricoAdapter(final Context pContext, final int pLayout) {
         super(pContext, 0);
 
         this.context = pContext;
@@ -47,7 +48,7 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
 
     private void vaiParaActivity(Endereco endereco) {
 
-        Intent intent = new Intent(context, PrincipalActivity.class);
+        Intent intent = new Intent(context, MainActivity.class);
 
         Bundle b = new Bundle();
         b.putString("historico_endereco", new Gson().toJson(endereco));
@@ -104,7 +105,7 @@ public final class HistoricoAdapter extends ArrayAdapter<Endereco> {
     }
 
     private static class ViewHolderSimpleRow {
-        public TextView histCepRow;
-        public TextView histResultadoRow;
+        TextView histCepRow;
+        TextView histResultadoRow;
     }
 }

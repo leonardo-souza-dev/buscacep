@@ -29,19 +29,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-    public void inicializa(double lat, double lng, float z, String cep) {
+    public void inicializa(double lat, double lng, float zoom, String cep) {
 
         this.lat = lat;
         this.lng = lng;
-        zoom = z;
+        this.zoom = zoom;
         markerOptions = new MarkerOptions();
         pot = new LatLng(this.lat, this.lng);
         markerOptions.position(pot).title(cep);
-    }
-
-    public void setMapaInicial() {
-        zoom = 1.0f;
-        setMapaInicial = true;
     }
 
     @Override

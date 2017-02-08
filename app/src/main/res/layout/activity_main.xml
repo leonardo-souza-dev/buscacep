@@ -9,7 +9,7 @@
 
         <variable
             name="mod"
-            type="com.leonardoserra.buscacepcommapa.vm.PrincipalViewModelo" />
+            type="com.leonardoserra.buscacepcommapa.vm.MainViewModel" />
     </data>
 
     <android.support.v4.widget.DrawerLayout
@@ -51,8 +51,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:focusableInTouchMode="true"
-                tools:context="com.leonardoserra.buscacepcommapa.PrincipalActivity"
-                tools:showIn="@layout/activity_principal"
+                tools:context="com.leonardoserra.buscacepcommapa.MainActivity"
+                tools:showIn="@layout/activity_main"
                 android:background="#ffff3f">
 
                 <RelativeLayout

@@ -16,16 +16,13 @@ import java.util.List;
 
 public class HistoricoActivity extends AppCompatActivity {
 
-    private ListView historicoListView;
-    private HistoricoAdapter historicoAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historico);
 
-        historicoListView = (ListView) findViewById(R.id.historicoListView);
-        historicoAdapter = new HistoricoAdapter(this, R.layout.hist_row);
+        ListView historicoListView = (ListView) findViewById(R.id.historicoListView);
+        HistoricoAdapter historicoAdapter = new HistoricoAdapter(this, R.layout.hist_row);
         historicoListView.setAdapter(historicoAdapter);
 
         List<Endereco> historico = obterHistorico();
@@ -43,7 +40,7 @@ public class HistoricoActivity extends AppCompatActivity {
         String historicoSp = sp.getString("historico", null);
 
         if (historicoSp == null) {
-            Log.i("LOGCEP", "historico nulo");
+            Log.i("BUSCACEPLOG", "historico nulo");
         } else {
 
             Gson gson = new Gson();
@@ -55,7 +52,6 @@ public class HistoricoActivity extends AppCompatActivity {
 
         if (historico.size() > 5)
             historico = historico.subList(0, 5);
-
 
         return historico;
 
